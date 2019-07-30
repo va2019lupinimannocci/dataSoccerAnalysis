@@ -12,12 +12,15 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
+    <squad-visualization></squad-visualization>
   </div>
 </template>
 
 <script>
+import SquadVisualization from './components/squadVisualization'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {SquadVisualization}
 }
 </script>
 
