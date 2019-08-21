@@ -26,29 +26,47 @@
       </b-col>
     </b-row>
     <b-row class="field col-up-offset-1">
-      <b-col>
+      <b-col cols="4">
         <h3>Rank Visualization</h3>
-        <div style="height:400px; background-color: #c8ffbd">
-          <div v-for="teamData in teams" :key="teamData.wyId" class="teams-data">
-            <div>
-              <span class="officialName">{{teamData.officialName}}</span>
-            </div>
+        <div style="height:400px; background-color: white">
+          <b-list-group class="teamList">
+            <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id"
+                               class="d-flex justify-content-between align-items-center" @click="teamStatsFromId(teamData.name)">
+              {{teamData.name}}
+            </b-list-group-item>
+          </b-list-group>
           </div>
+      </b-col>
+      <b-col>
+        <h3>Team's Stats Visualization</h3>
+        <div style="height:400px; background-color: whitesmoke">
+          <!--<rank-graph v-bind:class="[toggleClass]"/>-->
+          <v-radar
+            :stats="stats"
+            :polycolor="polycolor"
+            :radar="radar"
+            :scale="scale">
+          </v-radar>
         </div>
       </b-col>
     </b-row>
-    <b-row class="time col-up-offset-1 col-bt-offset-1">
+    <b-row>
       <b-col>
         <h5>Description</h5>
-        <div style="height:50px; background-color: #c8ffbd"></div>
+        <div style="height:50px; background-color: #81FF5FA6"></div>
       </b-col>
     </b-row>
   </b-container>
 </template>
 
 <script>
+import Radar from 'vue-radar'
+
 export default {
   name: 'squadVisualization',
+  components: {
+    'v-radar': Radar
+  },
   data () {
     return {
       locazione: {
@@ -59,7 +77,81 @@ export default {
         value: 'Italy',
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
-      teams: []
+      teams: [],
+      appoggio: [],
+      info: [],
+      toggleClass: 'ani1',
+      radar: {
+        size: '425', // pixel unit
+        viewbox: '800', // unit used inside the svg (here 400px = 1000 unités)
+        radius: '300', // same unit than above (diamètre = 900), keep the radius < (viewbox / 2)
+        structure: {
+          external: { // external stroke of the structure's polygon
+            strokeColor: 'rgba(0, 0, 0, 1)', // color (any css format is usable (hexa, rgb, rgba...))
+            strokeWidth: '2' // pixel unit
+          },
+          internals: { // internals stroke of the structure's polygon (one every 10%)
+            strokeColor: 'rgba(0, 0, 0, 1)', // color (any css format is usable (hexa, rgb, rgba...))
+            strokeWidth: '1' // pixel unit
+          },
+          average: { // average polygon (placed at 50%)
+            strokeColor: 'rgba(0, 0, 0, 1)', // stroke color (any css format is usable (hexa, rgb, rgba...))
+            strokeWidth: '2', // pixel unit
+            fillColor: 'rgba(0, 0, 0, .5)' // polygon color (any css format is usable (hexa, rgb, rgba...))
+          }
+        },
+        lines: { // lines from center to summits
+          strokeColor: 'rgba(0, 0, 0, 1)', // color (any css format is usable (hexa, rgb, rgba...))
+          strokeWidth: '1' // pixel unit
+        }
+      },
+      scale: { // scales of corresponding statistic
+        goal: 100, // key must be equal to the corresponding statistic, lowercased and without accents
+        passes: 100,
+        airduel: 100,
+        dribbling: 100,
+        kick: 100,
+        cross: 100,
+        defense: 100
+      },
+      stats: [
+        {
+          name: 'Goal', // string
+          value: 0, // int
+          shortName: 'Goal' // The two first letters are used to be display next to their corresponding summits
+        },
+        {
+          name: 'Passes',
+          value: 0,
+          shortName: 'Pass'
+        },
+        {
+          name: 'Air Duel',
+          value: 0,
+          shortName: 'Air Duel'
+        },
+        {
+          name: 'Dribbling',
+          value: 0,
+          shortName: 'Dribbling'
+        },
+        {
+          name: 'Kick',
+          value: 0,
+          shortName: 'Kick'
+        },
+        {
+          name: 'Crosses',
+          value: 0,
+          shortName: 'Cross'
+        },
+        {
+          name: 'Defense',
+          value: 0,
+          shortName: 'Defense'
+        }
+      ],
+      polycolor: '#81FF5FA6' // color (any css format is usable (hexa, rgb, rgba...))
     }
   },
   mounted () {
@@ -74,6 +166,16 @@ export default {
       .then(data => (this.teams = data))
       .then(this.getDistinctValuesLocation)
       .then(this.getDistinctValuesChampionship)
+    fetch('/static/data/results1.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.info = data))
+      .then(this.filterByElement)
   },
   methods: {
     getDistinctValuesLocation () {
@@ -116,6 +218,96 @@ export default {
     },
     jsUcfirst (string) {
       return string.charAt(0).toUpperCase() + string.slice(1)
+    },
+    jsLcfirst (string) {
+      return string.charAt(0).toLowerCase() + string.slice(1)
+    },
+    usePippoArray (array) {
+      this.appoggio = array
+      this.rankByScore(this.appoggio)
+    },
+    filterByElement () {
+      var pippoArray = []
+      var valueNational = this.jsLcfirst(this.locazione.value)
+      var valueChampionship = this.championship.value
+      this.info.forEach(function (teamInfo) {
+        if (teamInfo.type === valueNational && teamInfo.area === valueChampionship) {
+          console.log('entrato')
+          pippoArray.push(teamInfo)
+        }
+      })
+      this.usePippoArray(pippoArray)
+    },
+    rankByScore (array) {
+      array.forEach(function (team) {
+        var score = ((team.winStreak * 3) + (team.pairStreak))
+        team['score'] = score
+      })
+      array.sort(function (a, b) {
+        return b.score - a.score
+      })
+    },
+    teamStatsFromId (id) {
+      console.log('entrato')
+      let teamStats
+      this.appoggio.forEach(function (team) {
+        if (team.name === id) {
+          console.log('match')
+          teamStats = [{
+            name: 'Goal', // string
+            value: team.goal, // int
+            shortName: 'Goal' // The two first letters are used to be display next to their corresponding summits
+          },
+          {
+            name: 'Passes',
+            value: team.nummberPass,
+            shortName: 'Pass'
+          },
+          {
+            name: 'Air Duel',
+            value: team.airDuel,
+            shortName: 'AirDuel'
+          },
+          {
+            name: 'Dribbling',
+            value: team.dribbling,
+            shortName: 'Dr'
+          },
+          {
+            name: 'Kick',
+            value: team.kick,
+            shortName: 'Kick'
+          },
+          {
+            name: 'Crosses',
+            value: team.cross,
+            shortName: 'Cross'
+          },
+          {
+            name: 'Defense',
+            value: team.defense,
+            shortName: 'Defense'
+          }]
+          console.log(teamStats)
+        }
+      })
+      this.stats = []
+      this.stats = teamStats
+      console.log(this.stats)
+    }
+  },
+  watch: {
+    locazione: {
+      handler (newVal) {
+        this.filterByElement()
+      },
+      deep: true // force watching within properties
+    },
+    championship: {
+      handler (newVal) {
+        this.filterByElement()
+      },
+      deep: true // force watching within properties
     }
 
   }
@@ -124,5 +316,12 @@ export default {
 </script>
 
 <style scoped>
+  .teamList{
+    max-height: 400px;
+    margin-bottom: 10px;
+    overflow:scroll;
+    -webkit-overflow-scrolling: touch;
+    overflow-style: marquee-block ;
+  }
 
 </style>
