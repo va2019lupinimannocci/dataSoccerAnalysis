@@ -15,7 +15,7 @@
         </b-form-group>
       </b-col>
       <b-col>
-        <b-form-group label="Select a Championship">
+        <b-form-group label="Select a Championship" :disabled="checkBool()">
           <b-form-checkbox-group
             v-model="championship.value"
             :options="championship.options"
@@ -28,18 +28,20 @@
     <b-row class="field col-up-offset-1">
       <b-col cols="4">
         <h3>Rank Visualization</h3>
-        <div style="height:400px; background-color: white">
+        <div style="height:450px; background-color: white">
           <b-list-group class="teamList">
             <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id"
-                               class="d-flex justify-content-between align-items-center" @click="teamStatsFromId(teamData.name)">
+                               class="d-flex justify-content-between align-items-center"
+                               @click="teamStatsFromId(teamData.name)">
               {{teamData.name}}
+              <b-badge variant="primary" pill>{{teamData.abbr}}</b-badge>
             </b-list-group-item>
           </b-list-group>
-          </div>
+        </div>
       </b-col>
       <b-col>
         <h3>Team's Stats Visualization</h3>
-        <div style="height:400px; background-color: whitesmoke">
+        <div style="height:450px; background-color: whitesmoke">
           <!--<rank-graph v-bind:class="[toggleClass]"/>-->
           <v-radar
             :stats="stats"
@@ -51,9 +53,28 @@
       </b-col>
     </b-row>
     <b-row>
+      <div style="height:40px; background-color: white"></div>
+    </b-row>
+    <b-row>
+      <b-col cols="3">
+        <b-list-group>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Goal')">Goal</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Number of Passes')">Number of Passes</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Air Duel')">Air Duel</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Number of Foul')">Number of Foul</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Dribbling')">Dribbling</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Corner')">Corner</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Cross')">Cross</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Kick')">Kick</b-list-group-item>
+          <b-list-group-item button variant="dark" @click="passToBarchart('Defense')">Defense</b-list-group-item>
+        </b-list-group>
+
+      </b-col>
       <b-col>
-        <h5>Description</h5>
-        <div style="height:50px; background-color: #81FF5FA6"></div>
+        <div style="height:440px; background-color: whitesmoke">
+          <h3>Barchart Based on measure</h3>
+            <BarChart :arr="this.grouped"></BarChart>
+        </div>
       </b-col>
     </b-row>
   </b-container>
@@ -61,11 +82,13 @@
 
 <script>
 import Radar from 'vue-radar'
+import BarChart from './barChart'
 
 export default {
   name: 'squadVisualization',
   components: {
-    'v-radar': Radar
+    'v-radar': Radar,
+    BarChart
   },
   data () {
     return {
@@ -77,6 +100,7 @@ export default {
         value: 'Italy',
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
+      booleanoss: false,
       teams: [],
       appoggio: [],
       info: [],
@@ -151,7 +175,18 @@ export default {
           shortName: 'Defense'
         }
       ],
-      polycolor: '#81FF5FA6' // color (any css format is usable (hexa, rgb, rgba...))
+      polycolor: '#81FF5FA6', // color (any css format is usable (hexa, rgb, rgba...))
+      selected: '',
+      grouped: [{ name: 'Manchester City', value: 80 },
+        { name: 'Manchester United', value: 99 },
+        { name: 'Arsenal', value: 70 },
+        { name: 'Chelsea', value: 12 },
+        { name: 'Stoke City', value: 23 },
+        { name: 'Huddersfield', value: 23 },
+        { name: 'West Ham', value: 8 },
+        { name: 'Watford', value: 6 },
+        { name: 'Liverpool', value: 100 },
+        { name: 'Leicester', value: 9 }]
     }
   },
   mounted () {
@@ -229,13 +264,23 @@ export default {
     filterByElement () {
       var pippoArray = []
       var valueNational = this.jsLcfirst(this.locazione.value)
-      var valueChampionship = this.championship.value
-      this.info.forEach(function (teamInfo) {
-        if (teamInfo.type === valueNational && teamInfo.area === valueChampionship) {
-          console.log('entrato')
-          pippoArray.push(teamInfo)
-        }
-      })
+      if (valueNational === 'club') {
+        var valueChampionship = this.championship.value
+        this.info.forEach(function (teamInfo) {
+          if (teamInfo.type === valueNational && teamInfo.area === valueChampionship) {
+            console.log('entrato')
+            pippoArray.push(teamInfo)
+          }
+        })
+      }
+      if (valueNational === 'national') {
+        this.info.forEach(function (teamInfo) {
+          if (teamInfo.type === valueNational) {
+            console.log('entrato')
+            pippoArray.push(teamInfo)
+          }
+        })
+      }
       this.usePippoArray(pippoArray)
     },
     rankByScore (array) {
@@ -294,6 +339,61 @@ export default {
       this.stats = []
       this.stats = teamStats
       console.log(this.stats)
+    },
+    passToBarchart (selection) {
+      console.log('entrato')
+      let data = []
+      if (selection === 'Goal') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.goal})
+        })
+      }
+      if (selection === 'Number of Passes') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.nummberPass})
+        })
+      }
+      if (selection === 'Air Duel') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.airDuel})
+        })
+      }
+      if (selection === 'Number of Foul') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.numberFoul})
+        })
+      }
+      if (selection === 'Dribbling') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.dribbling})
+        })
+      }
+      if (selection === 'Corner') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.corner})
+        })
+      }
+      if (selection === 'Cross') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.cross})
+        })
+      }
+      if (selection === 'Kick') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.kick})
+        })
+      }
+      if (selection === 'Defense') {
+        this.appoggio.forEach(function (team) {
+          data.push({name: team.abbr, value: team.defense})
+        })
+      }
+      this.grouped = data
+      console.log(data)
+      console.log(this.grouped)
+    },
+    checkBool () {
+      return this.booleanoss
     }
   },
   watch: {
@@ -316,12 +416,12 @@ export default {
 </script>
 
 <style scoped>
-  .teamList{
-    max-height: 400px;
+  .teamList {
+    max-height: 450px;
     margin-bottom: 10px;
-    overflow:scroll;
+    overflow: scroll;
     -webkit-overflow-scrolling: touch;
-    overflow-style: marquee-block ;
+    overflow-style: marquee-block;
   }
 
 </style>
