@@ -72,7 +72,7 @@
       </b-col>
       <b-col>
         <div style="height:440px; background-color: whitesmoke">
-          <h3>Barchart Based on measure</h3>
+          <h3>Barchart Based on {{this.dimension}}</h3>
             <BarChart :arr="this.grouped"></BarChart>
         </div>
       </b-col>
@@ -102,6 +102,7 @@ export default {
       },
       booleanoss: false,
       teams: [],
+      dimension: 'Goal',
       appoggio: [],
       info: [],
       toggleClass: 'ani1',
@@ -211,6 +212,7 @@ export default {
       .then(res => res.json())
       .then(data => (this.info = data))
       .then(this.filterByElement)
+      .then(this.passToBarchart(this.dimension))
   },
   methods: {
     getDistinctValuesLocation () {
@@ -341,6 +343,7 @@ export default {
       console.log(this.stats)
     },
     passToBarchart (selection) {
+      this.dimension = selection
       console.log('entrato')
       let data = []
       if (selection === 'Goal') {
@@ -400,12 +403,14 @@ export default {
     locazione: {
       handler (newVal) {
         this.filterByElement()
+        this.passToBarchart(this.dimension)
       },
       deep: true // force watching within properties
     },
     championship: {
       handler (newVal) {
         this.filterByElement()
+        this.passToBarchart(this.dimension)
       },
       deep: true // force watching within properties
     }
