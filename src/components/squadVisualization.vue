@@ -69,9 +69,6 @@
       </b-col>
     </b-row>
     <b-row>
-      <div style="height:40px; background-color: white"></div>
-    </b-row>
-    <b-row>
       <b-col cols="3">
         <b-list-group>
           <b-list-group-item button variant="dark" @click="passToBarchart('Goal')">Goal</b-list-group-item>
@@ -87,9 +84,34 @@
 
       </b-col>
       <b-col>
-        <div style="height:440px; background-color: whitesmoke">
-          <h3>Barchart Based on {{this.dimension}}</h3>
+        <h3>Barchart Based on {{this.dimension}}</h3>
+        <div style="height:400px; background-color: whitesmoke">
+
             <BarChart :arr="this.grouped"></BarChart>
+        </div>
+      </b-col>
+    </b-row>
+    <div style="height: 20px"></div>
+    <b-row>
+      <b-col>
+        <h3>Visualization Description</h3>
+        <div class="description">
+          <p>This visualization, based on dimension selected, has the scope to help the team
+          manager to check what are the problem related to his team.</p>
+          <p>In particular, in the first part of visualization there is the possibility to shift
+          between club team (and all the major leauges available from data) or national team. Once
+          the team manager find his team, he could check his team's stats and understand those skills
+          that are needed to improve.</p>
+          <p>In the second part of the visualization instead is possibile to check, regarding different measures,
+          the screenshoot of all the contender inside the same league.</p>
+          <p>The measure considered are: <b-link @click="passToBarchart('Goal')">Goal</b-link>,
+            <b-link @click="passToBarchart('Number of Passes')">Number of Passes</b-link>, <b-link  @click="passToBarchart('Air Duel')">Air Duel</b-link>,
+            <b-link @click="passToBarchart('Number of Foul')">Number of Foul</b-link>, <b-link @click="passToBarchart('Dribbling')">Dribbling</b-link>,
+            <b-link @click="passToBarchart('Corner')">Corner</b-link>, <b-link @click="passToBarchart('Cross')">Cross</b-link>, <b-link @click="passToBarchart('Kick')">Kick</b-link> and
+            <b-link @click="passToBarchart('Defense')">Defense</b-link>.</p>
+          <p>The data are precomputed inside Anaconda, for each team has been extracted all the metrics available
+          inside the visualization, then an interpolation has been applied in order to have all the metrics between values 0 and 100.</p>
+
         </div>
       </b-col>
     </b-row>
