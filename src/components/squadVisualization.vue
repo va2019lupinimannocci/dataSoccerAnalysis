@@ -28,7 +28,7 @@
     <b-row class="field col-up-offset-1">
       <b-col cols="4">
         <h3>Rank Visualization</h3>
-        <div style="height:450px; background-color: white">
+        <div style="height:600px; background-color: white">
           <b-list-group class="teamList">
             <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id"
                                class="d-flex justify-content-between align-items-center"
@@ -41,14 +41,30 @@
       </b-col>
       <b-col>
         <h3>Team's Stats Visualization</h3>
-        <div style="height:450px; background-color: whitesmoke">
+        <div style="height:500px; background-color: whitesmoke">
           <!--<rank-graph v-bind:class="[toggleClass]"/>-->
+          <b-button variant="outline-success" size="sm" v-on:click="isHidden = true">Hide Legend</b-button>
+          <b-button variant="outline-success" size="sm" v-on:click="isHidden = !isHidden">Show Legend</b-button>
+
+          <div v-if="!isHidden" style="position: center">
+              <b-list-group horizontal style="margin-left: 40px; margin-top: 5px">
+                <b-list-group-item variant="success"><strong>Go</strong>al</b-list-group-item>
+                <b-list-group-item variant="success"><strong>Pa</strong>sses</b-list-group-item>
+                <b-list-group-item variant="success"><strong>Ai</strong>r duel</b-list-group-item>
+                <b-list-group-item variant="success"><strong>Dr</strong>ibbling</b-list-group-item>
+                <b-list-group-item variant="success"><strong>Ki</strong>ck</b-list-group-item>
+                <b-list-group-item variant="success"><strong>Cr</strong>osses</b-list-group-item>
+                <b-list-group-item variant="success"><strong>De</strong>fense</b-list-group-item>
+              </b-list-group>
+          </div>
+          <div>
           <v-radar
             :stats="stats"
             :polycolor="polycolor"
             :radar="radar"
             :scale="scale">
           </v-radar>
+          </div>
         </div>
       </b-col>
     </b-row>
@@ -101,8 +117,9 @@ export default {
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
       booleanoss: false,
+      isHidden: true,
       teams: [],
-      dimension: 'Goal',
+      dimension: 'select a measure',
       appoggio: [],
       info: [],
       toggleClass: 'ani1',
