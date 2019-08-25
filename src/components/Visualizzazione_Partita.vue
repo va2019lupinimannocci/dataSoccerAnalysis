@@ -2,16 +2,6 @@
     <b-container>
         <b-row class="col-up-offset-1">
             <b-col>
-                <b-form-group label="Select Dimension">
-                    <b-form-checkbox-group
-                            v-model="locazione.value"
-                            :options="locazione.options"
-                            name="buttonsLocation"
-                            buttons
-                    ></b-form-checkbox-group>
-                </b-form-group>
-            </b-col>
-            <b-col>
                 <b-form-group label="Select a Championship">
                     <b-form-checkbox-group
                             v-model="championship.value"
@@ -28,18 +18,20 @@
                 <div style="height:450px; background-color: white">
                     <b-list-group class="teamList">
                         <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex justify-content-between align-items-center"
+                                           @click="selectTeam(teamData, 0)">
                             {{teamData.name}}
                         </b-list-group-item>
                     </b-list-group>
                 </div>
             </b-col>
             <b-col cols="3">
-                <h3>Fuori casa</h3>
+                <h3>Away</h3>
                 <div style="height:450px; background-color: white">
                     <b-list-group class="teamList">
                         <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex justify-content-between align-items-center"
+                                           @click="selectTeam(teamData, 1)">
                             {{teamData.name}}
                         </b-list-group-item>
                     </b-list-group>
@@ -87,6 +79,13 @@ export default {
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
       teams: [],
+      italian_team: [],
+      english_team: [],
+      spanish_team: [],
+      french_team: [],
+      german_team: [],
+      nation_team: [],
+      competitions: [],
       appoggio: []
     }
   },
@@ -100,9 +99,8 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.teams = data))
-      .then(this.getDistinctValuesLocation)
-      .then(this.getDistinctValuesChampionship)
-    fetch('/static/data/results1.json', {
+      .then(this.division_team)
+    fetch('/static/data/competitions.json', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -110,100 +108,69 @@ export default {
 
     })
       .then(res => res.json())
-      .then(data => (this.info = data))
-      .then(this.filterByElement)
+      .then(data => (this.competitions = data))
+      .then(this.setOptionsChampions)
+      .then(this.filter_teams)
   },
   methods: {
-    getDistinctValuesLocation () {
-      var flags = []
+    setOptionsChampions () {
       var output = []
-      var l = this.teams.length
-      var i
-      for (i = 0; i < l; i++) {
-        if (flags[this.teams[i].type]) continue
-        flags[this.teams[i].type] = true
-        output.push(this.jsUcfirst(this.teams[i].type))
+      for (var i = 0; i < this.competitions.length; i++) {
+        output.push(this.competitions[i].name)
       }
-      console.log(output.length)
-      this.locazione.options = output
-      this.locazione.value = this.locazione.options[0]
-    },
-    getDistinctValuesChampionship () {
-      var visited = []
-      this.teams.forEach(function (team) {
-        if (team.type === 'club') {
-          const teamArea = team.area && team.area.name
-          console.log(teamArea)
-          visited.push(teamArea)
-        }
-      })
-      var flags = []
-      var output = []
-      var l = visited.length
-      var i
-      for (i = 0; i < l; i++) {
-        if (flags[visited[i]]) continue
-        flags[visited[i]] = true
-        output.push(this.jsUcfirst(visited[i]))
-      }
-      console.log(output.length)
+      this.championship.value = this.competitions[0].name
       this.championship.options = output
-      this.championship.value = this.championship.options[0]
-      console.log('visited')
-      console.log(visited.length)
     },
-    jsUcfirst (string) {
-      return string.charAt(0).toUpperCase() + string.slice(1)
-    },
-    jsLcfirst (string) {
-      return string.charAt(0).toLowerCase() + string.slice(1)
-    },
-    usePippoArray (array) {
-      this.appoggio = array
-      this.rankByScore(this.appoggio)
-    },
-    filterByElement () {
-      var pippoArray = []
-      var valueNational = this.jsLcfirst(this.locazione.value)
-      if (valueNational === 'club') {
-        var valueChampionship = this.championship.value
-        this.info.forEach(function (teamInfo) {
-          if (teamInfo.type === valueNational && teamInfo.area === valueChampionship) {
-            console.log('entrato')
-            pippoArray.push(teamInfo)
+    division_team () {
+      for (var i = 0; i < this.teams.length; i++) {
+        if (this.teams[i].type === 'club') {
+          if (this.teams[i].area.name === 'Wales' || this.teams[i].area.name === 'England') {
+            this.english_team.push(this.teams[i])
+          } else if (this.teams[i].area.name === 'Italy') {
+            this.italian_team.push(this.teams[i])
+          } else if (this.teams[i].area.name === 'France') {
+            this.french_team.push(this.teams[i])
+          } else if (this.teams[i].area.name === 'Spain') {
+            this.spanish_team.push(this.teams[i])
+          } else if (this.teams[i].area.name === 'Germany') {
+            this.german_team.push(this.teams[i])
           }
-        })
+        } else {
+          this.nation_team.push(this.teams[i])
+        }
       }
-      if (valueNational === 'national') {
-        this.info.forEach(function (teamInfo) {
-          if (teamInfo.type === valueNational) {
-            console.log('entrato')
-            pippoArray.push(teamInfo)
-          }
-        })
-      }
-      this.usePippoArray(pippoArray)
     },
-    rankByScore (array) {
-      array.forEach(function (team) {
-        var score = ((team.winStreak * 3) + (team.pairStreak))
-        team['score'] = score
-      })
-      array.sort(function (a, b) {
-        return b.score - a.score
-      })
+    filter_teams () {
+      var champ = this.championship.value
+      this.appoggio = []
+      if (champ === this.competitions[0].name) {
+        this.appoggio = this.italian_team
+      } else if (champ === this.competitions[1].name) {
+        this.appoggio = this.english_team
+      } else if (champ === this.competitions[2].name) {
+        this.appoggio = this.spanish_team
+      } else if (champ === this.competitions[3].name) {
+        this.appoggio = this.french_team
+      } else if (champ === this.competitions[4].name) {
+        this.appoggio = this.german_team
+      } else if (champ === this.competitions[5].name || champ === this.competitions[6].name) {
+        this.appoggio = this.nation_team
+      }
+    },
+    selectTeam (teamSelected, home) {
+      console.log('ciao')
     }
   },
   watch: {
     locazione: {
       handler (newVal) {
-        this.filterByElement()
+        this.filter_teams()
       },
       deep: true // force watching within properties
     },
     championship: {
       handler (newVal) {
-        this.filterByElement()
+        this.filter_teams()
       },
       deep: true // force watching within properties
     }
