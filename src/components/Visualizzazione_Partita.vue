@@ -12,7 +12,7 @@
                 </b-form-group>
             </b-col>
         </b-row>
-        <b-row class="field col-up-offset-1">
+        <b-row class="field col-up-offset-1 row_team">
             <b-col cols="3">
                 <h3>Home</h3>
                 <div style="height:450px; background-color: white">
@@ -39,8 +39,8 @@
             </b-col>
             <b-col cols="6">
                 <h3>Info match</h3>
-                <div style="height:500px; background-color: #DFDFDF">
-                    <h2>{{title_match}}</h2>
+                <div style="height:250px; background-color: #DFDFDF">
+                    <h4>{{title_match}}</h4>
                     <b-list-group>
                         <b-list-group-item class="info_match" style="text-align: left;">
                             {{ date_match }}
@@ -51,18 +51,6 @@
                         <b-list-group-item class="info_match" style="text-align: left;">
                             {{ duration_match }}
                         </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ referee_match }}
-                        </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ first_assistant }}
-                        </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ second_assistant }}
-                        </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ fourth_assistant }}
-                        </b-list-group-item>
                     </b-list-group>
                 </div>
             </b-col>
@@ -71,10 +59,10 @@
         </b-row>
         <b-row class="col-up-offset-1">
             <b-col cols="3">
-                <h3>Home</h3>
+                <h3>Home team</h3>
             </b-col>
             <b-col cols="3">
-                <h3>Fuori casa</h3>
+                <h3>Away team</h3>
             </b-col>
             <b-col cols="6">
                 <h3>Campo partita</h3>
@@ -105,7 +93,8 @@ export default {
       spanish_team: [],
       french_team: [],
       german_team: [],
-      nation_team: [],
+      european_team: [],
+      world_team: [],
       matches_England: {},
       matches_European_Championship: {},
       matches_France: {},
@@ -114,6 +103,7 @@ export default {
       matches_Spain: {},
       matches_World_Cup: {},
       competitions: [],
+      referees: {},
       appoggio: [],
       home_team: {},
       away_team: {},
@@ -125,31 +115,9 @@ export default {
       first_assistant: '',
       second_assistant: '',
       fourth_assistant: ''
-
     }
   },
   mounted () {
-    fetch('/static/data/teams.json', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-
-    })
-      .then(res => res.json())
-      .then(data => (this.teams = data))
-      .then(this.division_team)
-    fetch('/static/data/competitions.json', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-
-    })
-      .then(res => res.json())
-      .then(data => (this.competitions = data))
-      .then(this.setOptionsChampions)
-      .then(this.filter_teams)
     fetch('/static/data/matches/matches_England.json', {
       headers: {
         'Content-Type': 'application/json',
@@ -213,6 +181,36 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.matches_World_Cup = data))
+    fetch('/static/data/teams.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.teams = data))
+      .then(this.division_team)
+    fetch('/static/data/competitions.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.competitions = data))
+      .then(this.setOptionsChampions)
+      .then(this.filter_teams)
+    /* fetch('/static/data/referees.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.referees = data)) */
   },
   methods: {
     setOptionsChampions () {
@@ -238,9 +236,11 @@ export default {
             this.german_team.push(this.teams[i])
           }
         } else {
-          this.nation_team.push(this.teams[i])
+          this.world_team.push(this.teams[i])
+          this.european_team.push(this.teams[i])
         }
       }
+      // console.log(Object.values(this.matches_European_Championship[0].teamsData)[0].teamId)
     },
     filter_teams () {
       var champ = this.championship.value
@@ -255,8 +255,10 @@ export default {
         this.appoggio = this.french_team
       } else if (champ === this.competitions[4].name) {
         this.appoggio = this.german_team
-      } else if (champ === this.competitions[5].name || champ === this.competitions[6].name) {
-        this.appoggio = this.nation_team
+      } else if (champ === this.competitions[5].name) {
+        this.appoggio = this.european_team
+      } else if (champ === this.competitions[6].name) {
+        this.appoggio = this.world_team
       }
     },
     color_list_item (teamSelected, home) {
@@ -282,37 +284,94 @@ export default {
         this.away_team = teamSelected
       }
       if ((Object.keys(this.home_team).length === 0) || (Object.keys(this.away_team).length === 0)) {
+        this.title_match = 'Select the second team'
         console.log('Selezionare due squadre')
         return
       }
       if (this.home_team.name === this.away_team.name) {
+        this.title_match = 'Select two different teams'
+        this.date_match = ''
+        this.gameWeek_match = ''
+        this.duration_match = ''
         console.log('Squadre uguali')
         return
       }
       this.show_info_match()
+      this.show_formation()
       // this.color_list_item()
     },
-    show_info_match () {
+    show_formation () {
       var champ = this.championship.value
       var match = {}
       if (champ === this.competitions[0].name) {
         match = this.find_match(this.matches_Italy)
+      } else if (champ === this.competitions[1].name) {
+        match = this.find_match(this.matches_England)
+      } else if (champ === this.competitions[2].name) {
+        match = this.find_match(this.matches_Spain)
+      } else if (champ === this.competitions[3].name) {
+        match = this.find_match(this.matches_France)
+      } else if (champ === this.competitions[4].name) {
+        match = this.find_match(this.matches_Germany)
+      } else if (champ === this.competitions[5].name) {
+        match = this.find_match(this.matches_European_Championship)
+      } else if (champ === this.competitions[6].name) {
+        match = this.find_match(this.matches_World_Cup)
+      }
+    },
+    show_info_match () {
+      var champ = this.championship.value
+      var match = {}
+      var d = ''
+      if (champ === this.competitions[0].name) {
+        match = this.find_match(this.matches_Italy)
         this.title_match = match.label
-        var d = match.dateutc.split(' ')
+        d = match.dateutc.split(' ')
         this.date_match = 'Date match: ' + d[0]
         this.gameWeek_match = 'Game week: ' + match.gameweek
         this.duration_match = 'Duration match: ' + match.duration
       } else if (champ === this.competitions[1].name) {
-        this.title_match = 'Prova2'
-        this.date_match = 'Ciao2'
+        match = this.find_match(this.matches_England)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
       } else if (champ === this.competitions[2].name) {
-        this.appoggio = this.spanish_team
+        match = this.find_match(this.matches_Spain)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
       } else if (champ === this.competitions[3].name) {
-        this.appoggio = this.french_team
+        match = this.find_match(this.matches_France)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
       } else if (champ === this.competitions[4].name) {
-        this.appoggio = this.german_team
-      } else if (champ === this.competitions[5].name || champ === this.competitions[6].name) {
-        this.appoggio = this.nation_team
+        match = this.find_match(this.matches_Germany)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
+      } else if (champ === this.competitions[5].name) {
+        match = this.find_match(this.matches_European_Championship)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
+      } else if (champ === this.competitions[6].name) {
+        match = this.find_match(this.matches_World_Cup)
+        this.title_match = match.label
+        d = match.dateutc.split(' ')
+        this.date_match = 'Date match: ' + d[0]
+        this.gameWeek_match = 'Game week: ' + match.gameweek
+        this.duration_match = 'Duration match: ' + match.duration
       }
     },
     find_match (obj) {
@@ -321,6 +380,13 @@ export default {
       for (var i = 0; i < obj.length; i++) {
         if (typeof obj[i].teamsData[homeId] !== 'undefined' && typeof obj[i].teamsData[awayId] !== 'undefined') {
           return obj[i]
+        }
+      }
+    },
+    get_person (obj, id) {
+      for (var i = 0; i < obj.length; i++) {
+        if (obj[i].wyId === id) {
+          return obj[i].firstName + obj[i].lastName
         }
       }
     }
@@ -358,7 +424,7 @@ export default {
         text-align: left;
     }
     .teamList {
-        max-height: 500px;
+        max-height: 450px;
         margin-bottom: 10px;
         overflow: scroll;
         -webkit-overflow-scrolling: touch;
@@ -368,5 +434,8 @@ export default {
         height: 50px;
         margin-bottom: 10px;
         font-size: 20px;
+    }
+    .row_team {
+        height: 500px;
     }
 </style>
