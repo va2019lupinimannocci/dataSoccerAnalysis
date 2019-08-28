@@ -49,8 +49,8 @@
                             {{ gameWeek_match }}
                         </b-list-group-item>
                         <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ duration_match }}
-                        </b-list-group-item>
+                        {{ duration_match }}
+                    </b-list-group-item>
                     </b-list-group>
                 </div>
             </b-col>
@@ -63,9 +63,14 @@
                     <h3>Home team</h3>
                     <b-list-group class="teamList">
                         <b-list-group-item button v-for="players in playersHome" :key="players.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex align-items-center">
                             {{ players.lastName}}
-                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                            <template v-if = "players.goals > 0">
+                                <template v-for="index in parseInt(players.goals)">
+                                    <b-img :key="index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal"></b-img>
+                                </template>
+                            </template>
+                            <b-badge class="col-lf-offset-1" variant="primary" pill>{{players.role}}</b-badge>
                         </b-list-group-item>
                     </b-list-group>
                     <b-list-group>
@@ -400,12 +405,13 @@ export default {
             name: p.firstName,
             lastName: p.lastName,
             role: p.role.code3,
-            goals: formazioneHome.goals,
-            yellowCards: formazioneHome.yellowCards,
-            redCards: formazioneHome.redCards,
+            goals: formazioneHome[i].goals,
+            yellowCards: formazioneHome[i].yellowCards,
+            redCards: formazioneHome[i].redCards,
             substitutionMinute: sub
           }
           app.push(x)
+          console.log(x)
         }
         this.playersHome = this.orderByRole(app)
 
@@ -423,8 +429,8 @@ export default {
                 goals: inp.goals,
                 yellowCards: inp.yellowCards,
                 redCards: inp.redCards,
-                playerOut: sostituzioneHome.playerOut,
-                substitutionMinute: sostituzioneHome.minute
+                playerOut: sostituzioneHome[i].playerOut,
+                substitutionMinute: sostituzioneHome[i].minute
               }
               app.push(x)
             }
@@ -442,9 +448,9 @@ export default {
             name: p.firstName,
             lastName: p.lastName,
             role: p.role.code3,
-            goals: formazioneAway.goals,
-            yellowCards: formazioneAway.yellowCards,
-            redCards: formazioneAway.redCards
+            goals: formazioneAway[i].goals,
+            yellowCards: formazioneAway[i].yellowCards,
+            redCards: formazioneAway[i].redCards
           }
           app.push(x)
         }
@@ -465,8 +471,8 @@ export default {
                 goals: inp.goals,
                 yellowCards: inp.yellowCards,
                 redCards: inp.redCards,
-                playerOut: sostituzioneAway.playerOut,
-                minute: sostituzioneAway.minute
+                playerOut: sostituzioneAway[i].playerOut,
+                minute: sostituzioneAway[i].minute
               }
               app.push(x)
             }
@@ -575,5 +581,9 @@ export default {
     }
     .row_team {
         height: 500px;
+    }
+
+    .icon-goal {
+        height: 15px;
     }
 </style>
