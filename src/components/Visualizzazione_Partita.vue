@@ -58,19 +58,49 @@
             </b-col>
         </b-row>
         <b-row class="col-up-offset-1">
-            <b-col cols="3">
-                <h3>Home team</h3>
-            </b-col>
-            <b-col cols="3">
-                <h3>Away team</h3>
+            <b-col cols="6">
+                <div style="height:700px; background-color: #DFDFDF;">
+                    <h3>Home team</h3>
+                    <b-list-group class="teamList">
+                        <b-list-group-item button v-for="players in playersHome" :key="players.id"
+                                           class="d-flex justify-content-between align-items-center">
+                            {{ players.lastName}}
+                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-list-group>
+                        <b-list-group-item button v-for="players in playersSubHome" :key="players.id"
+                                           class="d-flex justify-content-between align-items-center">
+                            {{ players.lastName}}
+                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                        </b-list-group-item>
+                    </b-list-group>
+                </div>
             </b-col>
             <b-col cols="6">
-                <h3>Campo partita</h3>
-                <div style="height:500px; background-color: #ADF2A5"></div>
+                <div style="height:700px; background-color: #DFDFDF;">
+                    <h3>Away team</h3>
+                    <b-list-group class="teamList">
+                        <b-list-group-item button v-for="players in playersAway" :key="players.id"
+                                           class="d-flex justify-content-between align-items-center">
+                            {{ players.lastName}}
+                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                        </b-list-group-item>
+                    </b-list-group>
+                    <b-list-group>
+                        <b-list-group-item button v-for="players in playersSubAway" :key="players.id"
+                                           class="d-flex justify-content-between align-items-center">
+                            {{ players.lastName}}
+                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                        </b-list-group-item>
+                    </b-list-group>
+                </div>
             </b-col>
         </b-row>
         <b-row class="time col-up-offset-1 col-bt-offset-1">
             <b-col>
+                <h3>Campo partita</h3>
+                <div style="height:500px; background-color: #ADF2A5"></div>
                 <h5>Slider tempo partita</h5>
                 <div style="height:50px; background-color: #C8FFBD"></div>
             </b-col>
@@ -104,9 +134,15 @@ export default {
       matches_World_Cup: {},
       competitions: [],
       referees: {},
+      players_data: {},
       appoggio: [],
       home_team: {},
       away_team: {},
+      current_match: {},
+      playersHome: [],
+      playersSubHome: [],
+      playersAway: [],
+      playersSubAway: [],
       title_match: 'Select two valid team',
       date_match: '',
       gameWeek_match: '',
@@ -202,6 +238,15 @@ export default {
       .then(data => (this.competitions = data))
       .then(this.setOptionsChampions)
       .then(this.filter_teams)
+    fetch('/static/data/players.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.players_data = data))
     /* fetch('/static/data/referees.json', {
       headers: {
         'Content-Type': 'application/json',
@@ -293,100 +338,193 @@ export default {
         this.date_match = ''
         this.gameWeek_match = ''
         this.duration_match = ''
+        this.playersHome = []
+        this.playersSubHome = []
+        this.playersAway = []
+        this.playersSubAway = []
         console.log('Squadre uguali')
         return
       }
+      this.set_current_match()
       this.show_info_match()
       this.show_formation()
       // this.color_list_item()
     },
-    show_formation () {
+    set_current_match  () {
       var champ = this.championship.value
-      var match = {}
       if (champ === this.competitions[0].name) {
-        match = this.find_match(this.matches_Italy)
+        this.current_match = this.find_match(this.matches_Italy)
       } else if (champ === this.competitions[1].name) {
-        match = this.find_match(this.matches_England)
+        this.current_match = this.find_match(this.matches_England)
       } else if (champ === this.competitions[2].name) {
-        match = this.find_match(this.matches_Spain)
+        this.current_match = this.find_match(this.matches_Spain)
       } else if (champ === this.competitions[3].name) {
-        match = this.find_match(this.matches_France)
+        this.current_match = this.find_match(this.matches_France)
       } else if (champ === this.competitions[4].name) {
-        match = this.find_match(this.matches_Germany)
+        this.current_match = this.find_match(this.matches_Germany)
       } else if (champ === this.competitions[5].name) {
-        match = this.find_match(this.matches_European_Championship)
+        this.current_match = this.find_match(this.matches_European_Championship)
       } else if (champ === this.competitions[6].name) {
-        match = this.find_match(this.matches_World_Cup)
+        this.current_match = this.find_match(this.matches_World_Cup)
       }
     },
-    show_info_match () {
-      var champ = this.championship.value
-      var match = {}
-      var d = ''
-      if (champ === this.competitions[0].name) {
-        match = this.find_match(this.matches_Italy)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[1].name) {
-        match = this.find_match(this.matches_England)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[2].name) {
-        match = this.find_match(this.matches_Spain)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[3].name) {
-        match = this.find_match(this.matches_France)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[4].name) {
-        match = this.find_match(this.matches_Germany)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[5].name) {
-        match = this.find_match(this.matches_European_Championship)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
-      } else if (champ === this.competitions[6].name) {
-        match = this.find_match(this.matches_World_Cup)
-        this.title_match = match.label
-        d = match.dateutc.split(' ')
-        this.date_match = 'Date match: ' + d[0]
-        this.gameWeek_match = 'Game week: ' + match.gameweek
-        this.duration_match = 'Duration match: ' + match.duration
+    show_formation () {
+      var formazioneHome = {}
+      var sostituzioneHome = {}
+      var formazioneAway = {}
+      var sostituzioneAway = {}
+      var bench = {}
+      var i = 0
+      var j = 0
+      var p = {}
+      var x = {}
+      var inp = {}
+      var sub = null
+      var app = []
+      this.playersHome = []
+      this.playersSubHome = []
+      this.playersAway = []
+      this.playersSubAway = []
+
+      if (this.current_match.teamsData[this.home_team.wyId].hasFormation) {
+        formazioneHome = this.current_match.teamsData[this.home_team.wyId].formation.lineup
+        sostituzioneHome = this.current_match.teamsData[this.home_team.wyId].formation.substitutions
+        for (i = 0; i < formazioneHome.length; i++) {
+          p = this.get_person(this.players_data, formazioneHome[i].playerId)
+          for (j = 0; j < sostituzioneHome.length; j++) {
+            if (formazioneHome[i].playerId === sostituzioneHome[j].playerOut) {
+              sub = sostituzioneHome[j].minute
+            }
+          }
+          x = {
+            name: p.firstName,
+            lastName: p.lastName,
+            role: p.role.code3,
+            goals: formazioneHome.goals,
+            yellowCards: formazioneHome.yellowCards,
+            redCards: formazioneHome.redCards,
+            substitutionMinute: sub
+          }
+          app.push(x)
+        }
+        this.playersHome = this.orderByRole(app)
+
+        app = []
+        bench = this.current_match.teamsData[this.home_team.wyId].formation.bench
+        for (i = 0; i < sostituzioneHome.length; i++) {
+          p = this.get_person(this.players_data, sostituzioneHome[i].playerIn)
+          for (j = 0; j < bench.length; j++) {
+            if (bench[j].playerId === sostituzioneHome[i].playerIn) {
+              inp = bench[j]
+              x = {
+                name: p.firstName,
+                lastName: p.lastName,
+                role: p.role.code3,
+                goals: inp.goals,
+                yellowCards: inp.yellowCards,
+                redCards: inp.redCards,
+                playerOut: sostituzioneHome.playerOut,
+                substitutionMinute: sostituzioneHome.minute
+              }
+              app.push(x)
+            }
+          }
+        }
+        this.playersSubHome = this.orderByRole(app)
       }
+
+      app = []
+      if (this.current_match.teamsData[this.away_team.wyId].hasFormation) {
+        formazioneAway = this.current_match.teamsData[this.away_team.wyId].formation.lineup
+        for (i = 0; i < formazioneAway.length; i++) {
+          p = this.get_person(this.players_data, formazioneAway[i].playerId)
+          x = {
+            name: p.firstName,
+            lastName: p.lastName,
+            role: p.role.code3,
+            goals: formazioneAway.goals,
+            yellowCards: formazioneAway.yellowCards,
+            redCards: formazioneAway.redCards
+          }
+          app.push(x)
+        }
+        this.playersAway = this.orderByRole(app)
+
+        app = []
+        sostituzioneAway = this.current_match.teamsData[this.away_team.wyId].formation.substitutions
+        bench = this.current_match.teamsData[this.away_team.wyId].formation.bench
+        for (i = 0; i < sostituzioneAway.length; i++) {
+          p = this.get_person(this.players_data, sostituzioneAway[i].playerIn)
+          for (j = 0; j < bench.length; j++) {
+            if (bench[j].playerId === sostituzioneAway[i].playerIn) {
+              inp = bench[j]
+              x = {
+                name: p.firstName,
+                lastName: p.lastName,
+                role: p.role.code3,
+                goals: inp.goals,
+                yellowCards: inp.yellowCards,
+                redCards: inp.redCards,
+                playerOut: sostituzioneAway.playerOut,
+                minute: sostituzioneAway.minute
+              }
+              app.push(x)
+            }
+          }
+        }
+        this.playersSubAway = this.orderByRole(app)
+      }
+    },
+    orderByRole (obj) {
+      var i
+      var arr = []
+
+      for (i = 0; i < obj.length; i++) {
+        if (obj[i].role === 'GKP') {
+          arr.push(obj[i])
+          break
+        }
+      }
+      for (i = 0; i < obj.length; i++) {
+        if (obj[i].role === 'DEF') {
+          arr.push(obj[i])
+        }
+      }
+      for (i = 0; i < obj.length; i++) {
+        if (obj[i].role === 'MID') {
+          arr.push(obj[i])
+        }
+      }
+      for (i = 0; i < obj.length; i++) {
+        if (obj[i].role === 'FWD') {
+          arr.push(obj[i])
+        }
+      }
+      return arr
+    },
+    show_info_match () {
+      var d = ''
+      this.title_match = this.current_match.label
+      d = this.current_match.dateutc.split(' ')
+      this.date_match = 'Date match: ' + d[0]
+      this.gameWeek_match = 'Game week: ' + this.current_match.gameweek
+      this.duration_match = 'Duration match: ' + this.current_match.duration
     },
     find_match (obj) {
       var homeId = this.home_team.wyId
       var awayId = this.away_team.wyId
       for (var i = 0; i < obj.length; i++) {
         if (typeof obj[i].teamsData[homeId] !== 'undefined' && typeof obj[i].teamsData[awayId] !== 'undefined') {
-          return obj[i]
+          if (obj[i].teamsData[homeId].side === 'home' && obj[i].teamsData[awayId].side === 'away') {
+            return obj[i]
+          }
         }
       }
     },
     get_person (obj, id) {
       for (var i = 0; i < obj.length; i++) {
         if (obj[i].wyId === id) {
-          return obj[i].firstName + obj[i].lastName
+          return obj[i]
         }
       }
     }
