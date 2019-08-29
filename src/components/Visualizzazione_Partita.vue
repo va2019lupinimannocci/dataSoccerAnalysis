@@ -17,9 +17,10 @@
                 <h3>Home</h3>
                 <div style="height:450px; background-color: white">
                     <b-list-group class="teamList">
-                        <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id" ref="home_team"
+                        <b-list-group-item button v-for="(teamData, index) in appoggio" :key="teamData.id" ref="home_team"
                                            class="d-flex justify-content-between align-items-center"
-                                           @click="selectTeam(teamData, 0)">
+                                           v-bind:style=" {backgroundColor:color_list_home[index].color} "
+                                           @click="selectTeam(teamData, 0, index)">
                             {{teamData.name}}
                         </b-list-group-item>
                     </b-list-group>
@@ -29,9 +30,10 @@
                 <h3>Away</h3>
                 <div style="height:450px; background-color: white">
                     <b-list-group class="teamList">
-                        <b-list-group-item button v-for="teamData in appoggio" :key="teamData.id" ref="away_team"
+                        <b-list-group-item button v-for="(teamData, index2) in appoggio" :key="teamData.id" ref="away_team"
                                            class="d-flex justify-content-between align-items-center"
-                                           @click="selectTeam(teamData, 1)">
+                                           v-bind:style=" {backgroundColor:color_list_away[index2].color} "
+                                           @click="selectTeam(teamData, 1, index2)">
                             {{teamData.name}}
                         </b-list-group-item>
                     </b-list-group>
@@ -39,19 +41,21 @@
             </b-col>
             <b-col cols="6">
                 <h3>Info match</h3>
-                <div style="height:250px; background-color: #DFDFDF">
-                    <h4>{{title_match}}</h4>
-                    <b-list-group>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ date_match }}
-                        </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                            {{ gameWeek_match }}
-                        </b-list-group-item>
-                        <b-list-group-item class="info_match" style="text-align: left;">
-                        {{ duration_match }}
-                    </b-list-group-item>
-                    </b-list-group>
+                <div style="height:240px; background-color: #DFDFDF">
+                    <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #FDA5A5">{{title_match}}</h4>
+                    <template v-if = "date_match !== ''">
+                        <b-list-group>
+                            <b-list-group-item class="info_match" style="text-align: left;">
+                                {{ date_match }}
+                            </b-list-group-item>
+                            <b-list-group-item class="info_match" style="text-align: left;">
+                                {{ gameWeek_match }}
+                            </b-list-group-item>
+                            <b-list-group-item class="info_match" style="text-align: left;">
+                            {{ duration_match }}
+                            </b-list-group-item>
+                        </b-list-group>
+                    </template>
                 </div>
             </b-col>
             <b-col>
@@ -59,44 +63,143 @@
         </b-row>
         <b-row class="col-up-offset-1">
             <b-col cols="6">
-                <div style="height:700px; background-color: #DFDFDF;">
-                    <h3>Home team</h3>
-                    <b-list-group class="teamList">
+                <div style="height:900px; background-color: #DFDFDF;">
+                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5;">Home team</h3>
+                    <template v-if = "coachHome !== ''">
+                        <b-list-group class="playerList">
+                            <b-list-group-item button class="d-flex align-items-center">
+                               {{ coachHome }}
+                                <b-badge class="col-lf-offset-1" variant="primary" pill>COACH</b-badge>
+                             </b-list-group-item>
+                        </b-list-group>
+                    </template>
+                    <template v-if = "this.playersHome.length !== 0" >
+                        <h4>Line up</h4>
+                    </template>
+                    <b-list-group class="playerList">
                         <b-list-group-item button v-for="players in playersHome" :key="players.id"
                                            class="d-flex align-items-center">
                             {{ players.lastName}}
                             <template v-if = "players.goals > 0">
                                 <template v-for="index in parseInt(players.goals)">
-                                    <b-img :key="index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal"></b-img>
+                                    <b-img :key="'home-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
                                 </template>
+                            </template>
+                            <template v-if = "players.ownGoals > 0">
+                                <template v-for="index in parseInt(players.ownGoals)">
+                                    <b-img :key="'home-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.yellowCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-yellow-card.png" fluid alt="yellow card" v-b-popover.hover="players.yellowCards" title="Minute yellow card:"></b-img>
+                            </template>
+                            <template v-if = "players.redCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-red-card.png" fluid alt="red card" v-b-popover.hover="players.redCards" title="Minute red card:"></b-img>
+                            </template>
+                            <template v-if = "players.substitutionMinute > 0">
+                                <b-img class="icon-card col-lf-offset-1" v-bind:src="players.nameImage" fluid alt="substitution" v-b-popover.hover="String(players.substitutionMinute)" title="Minute substitution:"></b-img>
                             </template>
                             <b-badge class="col-lf-offset-1" variant="primary" pill>{{players.role}}</b-badge>
                         </b-list-group-item>
                     </b-list-group>
                     <b-list-group>
+                        <template v-if = "this.playersHome.length !== 0" >
+                            <h4>Substitutions</h4>
+                        </template>
                         <b-list-group-item button v-for="players in playersSubHome" :key="players.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex align-items-center">
                             {{ players.lastName}}
-                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                            <template v-if = "players.goals > 0">
+                                <template v-for="index in parseInt(players.goals)">
+                                    <b-img :key="'sub-home-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.ownGoals > 0">
+                                <template v-for="index in parseInt(players.ownGoals)">
+                                    <b-img :key="'sub-home-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.yellowCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-yellow-card.png" fluid alt="yellow card" v-b-popover.hover="players.yellowCards" title="Minute yellow card:"></b-img>
+                            </template>
+                            <template v-if = "players.redCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-red-card.png" fluid alt="red card" v-b-popover.hover="players.redCards" title="Minute red card:"></b-img>
+                            </template>
+                            <template v-if = "players.substitutionMinute > 0">
+                                <b-img class="icon-card col-lf-offset-1" v-bind:src="players.nameImage" fluid alt="substitution" v-b-popover.hover="String(players.substitutionMinute)" title="Minute substitution:"></b-img>
+                            </template>
+                            <b-badge class="col-lf-offset-1" variant="primary" pill>{{players.role}}</b-badge>
                         </b-list-group-item>
                     </b-list-group>
                 </div>
             </b-col>
             <b-col cols="6">
-                <div style="height:700px; background-color: #DFDFDF;">
-                    <h3>Away team</h3>
-                    <b-list-group class="teamList">
+                <div style="height:900px; background-color: #DFDFDF;">
+                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #A5E3FD">Away team</h3>
+                    <template v-if = "coachAway !== ''">
+                        <b-list-group class="playerList">
+                            <b-list-group-item button class="d-flex align-items-center">
+                                {{ coachAway }}
+                                <b-badge class="col-lf-offset-1" variant="primary" pill>COACH</b-badge>
+                            </b-list-group-item>
+                        </b-list-group>
+                    </template>
+                    <template v-if = "this.playersAway.length !== 0" >
+                        <h4>Line up</h4>
+                    </template>
+                    <b-list-group class="playerList">
                         <b-list-group-item button v-for="players in playersAway" :key="players.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex align-items-center">
                             {{ players.lastName}}
-                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                            <template v-if = "players.goals > 0">
+                                <template v-for="index in parseInt(players.goals)">
+                                    <b-img :key="'away-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.ownGoals > 0">
+                                <template v-for="index in parseInt(players.ownGoals)">
+                                    <b-img :key="'away-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.yellowCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-yellow-card.png" fluid alt="yellow card" v-b-popover.hover="players.yellowCards" title="Minute yellow card:"></b-img>
+                            </template>
+                            <template v-if = "players.redCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-red-card.png" fluid alt="red card" v-b-popover.hover="players.redCards" title="Minute red card:"></b-img>
+                            </template>
+                            <template v-if = "players.substitutionMinute > 0">
+                                <b-img class="icon-card col-lf-offset-1" v-bind:src="players.nameImage" fluid alt="substitution" v-b-popover.hover="String(players.substitutionMinute)" title="Minute substitution:"></b-img>
+                            </template>
+                            <b-badge class="col-lf-offset-1" variant="primary" pill>{{players.role}}</b-badge>
                         </b-list-group-item>
                     </b-list-group>
                     <b-list-group>
+                        <template v-if = "this.playersAway.length !== 0" >
+                            <h4>Substitutions</h4>
+                        </template>
                         <b-list-group-item button v-for="players in playersSubAway" :key="players.id"
-                                           class="d-flex justify-content-between align-items-center">
+                                           class="d-flex align-items-center">
                             {{ players.lastName}}
-                            <b-badge variant="primary" pill>{{players.role}}</b-badge>
+                            <template v-if = "players.goals > 0">
+                                <template v-for="index in parseInt(players.goals)">
+                                    <b-img :key="'sub-away-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.ownGoals > 0">
+                                <template v-for="index in parseInt(players.ownGoals)">
+                                    <b-img :key="'sub-away-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
+                                </template>
+                            </template>
+                            <template v-if = "players.yellowCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-yellow-card.png" fluid alt="yellow card" v-b-popover.hover="players.yellowCards" title="Minute yellow card:"></b-img>
+                            </template>
+                            <template v-if = "players.redCards > 0">
+                                <b-img class="icon-card col-lf-offset-1" src="/static/image/icon-red-card.png" fluid alt="red card" v-b-popover.hover="players.redCards" title="Minute red card:"></b-img>
+                            </template>
+                            <template v-if = "players.substitutionMinute > 0">
+                                <b-img class="icon-card col-lf-offset-1" v-bind:src="players.nameImage" fluid alt="substitution" v-b-popover.hover="String(players.substitutionMinute)" title="Minute substitution:"></b-img>
+                            </template>
+                            <b-badge class="col-lf-offset-1" variant="primary" pill>{{players.role}}</b-badge>
                         </b-list-group-item>
                     </b-list-group>
                 </div>
@@ -138,9 +241,16 @@ export default {
       matches_Spain: {},
       matches_World_Cup: {},
       competitions: [],
-      referees: {},
       players_data: {},
+      coaches: {},
       appoggio: [],
+      color_list_home: [],
+      color_list_away: [],
+      nameImage: [
+        '/static/image/icon-sub-blue.png',
+        '/static/image/icon-sub-green.png',
+        '/static/image/icon-sub-violet.png'
+      ],
       home_team: {},
       away_team: {},
       current_match: {},
@@ -148,14 +258,12 @@ export default {
       playersSubHome: [],
       playersAway: [],
       playersSubAway: [],
+      coachHome: '',
+      coachAway: '',
       title_match: 'Select two valid team',
       date_match: '',
       gameWeek_match: '',
-      duration_match: '',
-      referee_match: '',
-      first_assistant: '',
-      second_assistant: '',
-      fourth_assistant: ''
+      duration_match: ''
     }
   },
   mounted () {
@@ -252,7 +360,7 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.players_data = data))
-    /* fetch('/static/data/referees.json', {
+    fetch('/static/data/coaches.json', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -260,7 +368,7 @@ export default {
 
     })
       .then(res => res.json())
-      .then(data => (this.referees = data)) */
+      .then(data => (this.coaches = data))
   },
   methods: {
     setOptionsChampions () {
@@ -295,6 +403,11 @@ export default {
     filter_teams () {
       var champ = this.championship.value
       this.appoggio = []
+      this.color_list_away = []
+      this.color_list_home = []
+      var i = 0
+      var x = {}
+      var y = {}
       if (champ === this.competitions[0].name) {
         this.appoggio = this.italian_team
       } else if (champ === this.competitions[1].name) {
@@ -310,8 +423,32 @@ export default {
       } else if (champ === this.competitions[6].name) {
         this.appoggio = this.world_team
       }
+
+      for (i = 0; i < this.appoggio.length; i++) {
+        x = {
+          color: '#FFFFFF'
+        }
+        y = {
+          color: '#FFFFFF'
+        }
+        this.color_list_home.push(x)
+        this.color_list_away.push(y)
+      }
     },
-    color_list_item (teamSelected, home) {
+    color_list_item (teamSelected, home, index) {
+      var i = 0
+      if (home === 0) {
+        for (i = 0; i < this.color_list_home.length; i++) {
+          this.color_list_home[i].color = '#FFFFFF'
+        }
+        this.color_list_home[index].color = '#A5FDA5'
+      } else {
+        for (i = 0; i < this.color_list_away.length; i++) {
+          this.color_list_away[i].color = '#FFFFFF'
+        }
+        this.color_list_away[index].color = '#A5E3FD'
+      }
+      /* console.log(this.$refs.home_team[0])
       if (home === 0) {
         for (var i = 0; i < this.$refs.home_team; i++) {
           console.log(this.$refs.home_team[i].textNode)
@@ -325,14 +462,17 @@ export default {
             console.log(this.$refs.away_team[j].name)
           }
         }
-      }
+      } */
     },
-    selectTeam (teamSelected, home) {
+    selectTeam (teamSelected, home, index) {
       if (home === 0) {
         this.home_team = teamSelected
       } else {
         this.away_team = teamSelected
       }
+
+      this.color_list_item(teamSelected, home, index)
+
       if ((Object.keys(this.home_team).length === 0) || (Object.keys(this.away_team).length === 0)) {
         this.title_match = 'Select the second team'
         console.log('Selezionare due squadre')
@@ -347,13 +487,14 @@ export default {
         this.playersSubHome = []
         this.playersAway = []
         this.playersSubAway = []
+        this.coachHome = ''
+        this.coachAway = ''
         console.log('Squadre uguali')
         return
       }
       this.set_current_match()
       this.show_info_match()
       this.show_formation()
-      // this.color_list_item()
     },
     set_current_match  () {
       var champ = this.championship.value
@@ -384,8 +525,12 @@ export default {
       var p = {}
       var x = {}
       var inp = {}
-      var sub = null
+      var subMin = null
+      var subIn = null
       var app = []
+      var coach = ''
+      var nm = null
+      var index = 0
       this.playersHome = []
       this.playersSubHome = []
       this.playersAway = []
@@ -394,11 +539,16 @@ export default {
       if (this.current_match.teamsData[this.home_team.wyId].hasFormation) {
         formazioneHome = this.current_match.teamsData[this.home_team.wyId].formation.lineup
         sostituzioneHome = this.current_match.teamsData[this.home_team.wyId].formation.substitutions
+        coach = this.get_person(this.coaches, this.current_match.teamsData[this.home_team.wyId].coachId)
+        this.coachHome = 'Coach: ' + coach.lastName
         for (i = 0; i < formazioneHome.length; i++) {
           p = this.get_person(this.players_data, formazioneHome[i].playerId)
           for (j = 0; j < sostituzioneHome.length; j++) {
             if (formazioneHome[i].playerId === sostituzioneHome[j].playerOut) {
-              sub = sostituzioneHome[j].minute
+              subMin = sostituzioneHome[j].minute
+              subIn = sostituzioneHome[j].playerIn
+              nm = this.nameImage[index]
+              index = index + 1
             }
           }
           x = {
@@ -406,15 +556,21 @@ export default {
             lastName: p.lastName,
             role: p.role.code3,
             goals: formazioneHome[i].goals,
+            ownGoals: formazioneHome[i].ownGoals,
             yellowCards: formazioneHome[i].yellowCards,
             redCards: formazioneHome[i].redCards,
-            substitutionMinute: sub
+            playerIn: subIn,
+            substitutionMinute: subMin,
+            nameImage: nm
           }
+          subMin = null
+          subIn = null
+          nm = null
           app.push(x)
-          console.log(x)
         }
         this.playersHome = this.orderByRole(app)
 
+        index = 0
         app = []
         bench = this.current_match.teamsData[this.home_team.wyId].formation.bench
         for (i = 0; i < sostituzioneHome.length; i++) {
@@ -427,10 +583,12 @@ export default {
                 lastName: p.lastName,
                 role: p.role.code3,
                 goals: inp.goals,
+                ownGoals: inp.ownGoals,
                 yellowCards: inp.yellowCards,
                 redCards: inp.redCards,
                 playerOut: sostituzioneHome[i].playerOut,
-                substitutionMinute: sostituzioneHome[i].minute
+                substitutionMinute: sostituzioneHome[i].minute,
+                nameImage: this.nameImage[i]
               }
               app.push(x)
             }
@@ -439,25 +597,44 @@ export default {
         this.playersSubHome = this.orderByRole(app)
       }
 
+      index = 0
       app = []
       if (this.current_match.teamsData[this.away_team.wyId].hasFormation) {
         formazioneAway = this.current_match.teamsData[this.away_team.wyId].formation.lineup
+        sostituzioneAway = this.current_match.teamsData[this.away_team.wyId].formation.substitutions
+        coach = this.get_person(this.coaches, this.current_match.teamsData[this.away_team.wyId].coachId)
+        this.coachAway = 'Coach: ' + coach.lastName
         for (i = 0; i < formazioneAway.length; i++) {
           p = this.get_person(this.players_data, formazioneAway[i].playerId)
+          for (j = 0; j < sostituzioneAway.length; j++) {
+            if (formazioneAway[i].playerId === sostituzioneAway[j].playerOut) {
+              subMin = sostituzioneAway[j].minute
+              subIn = sostituzioneAway[j].playerIn
+              nm = this.nameImage[index]
+              index = index + 1
+            }
+          }
           x = {
             name: p.firstName,
             lastName: p.lastName,
             role: p.role.code3,
             goals: formazioneAway[i].goals,
+            ownGoals: formazioneAway[i].ownGoals,
             yellowCards: formazioneAway[i].yellowCards,
-            redCards: formazioneAway[i].redCards
+            redCards: formazioneAway[i].redCards,
+            playerIn: subIn,
+            substitutionMinute: subMin,
+            nameImage: nm
           }
+          subMin = null
+          subIn = null
+          nm = null
           app.push(x)
         }
         this.playersAway = this.orderByRole(app)
 
+        index = 0
         app = []
-        sostituzioneAway = this.current_match.teamsData[this.away_team.wyId].formation.substitutions
         bench = this.current_match.teamsData[this.away_team.wyId].formation.bench
         for (i = 0; i < sostituzioneAway.length; i++) {
           p = this.get_person(this.players_data, sostituzioneAway[i].playerIn)
@@ -469,10 +646,12 @@ export default {
                 lastName: p.lastName,
                 role: p.role.code3,
                 goals: inp.goals,
+                ownGoals: inp.ownGoals,
                 yellowCards: inp.yellowCards,
                 redCards: inp.redCards,
                 playerOut: sostituzioneAway[i].playerOut,
-                minute: sostituzioneAway[i].minute
+                substitutionMinute: sostituzioneAway[i].minute,
+                nameImage: this.nameImage[i]
               }
               app.push(x)
             }
@@ -567,12 +746,19 @@ export default {
     .text-align {
         text-align: left;
     }
+    h4 {
+        font-size: 20px;
+    }
     .teamList {
-        max-height: 450px;
+         max-height: 450px;
+         margin-bottom: 10px;
+         overflow: scroll;
+         -webkit-overflow-scrolling: touch;
+         overflow-style: marquee-block;
+     }
+    .playerList {
+        max-height: 600px;
         margin-bottom: 10px;
-        overflow: scroll;
-        -webkit-overflow-scrolling: touch;
-        overflow-style: marquee-block;
     }
     .info_match {
         height: 50px;
@@ -585,5 +771,8 @@ export default {
 
     .icon-goal {
         height: 15px;
+    }
+    .icon-card {
+        height: 20px;
     }
 </style>
