@@ -42,9 +42,16 @@
                 </b-col>
             </template>
             <template v-else>
-                <div>
-                    <b-form-select :options="national_match" :select-size="20"></b-form-select>
-                </div>
+                <b-col cols="6">
+                    <b-list-group class="teamList">
+                        <b-list-group-item  button v-for="(m, index3) in national_match" :key="m.id" ref="nations"
+                                           class="d-flex justify-content-between align-items-center"
+                                           v-bind:style=" {backgroundColor:color_nation[index3].color} "
+                                           @click="select_match(m, index3)">
+                            {{m.label.split(',')[0]}}
+                        </b-list-group-item>
+                    </b-list-group>
+                </b-col>
             </template>
             <b-col cols="6">
                 <h3>Info match</h3>
@@ -224,6 +231,9 @@
 </template>
 
 <script>
+// eslint-disable-next-line no-unused-vars
+const d3 = require('d3')
+
 export default {
   name: 'Visualizzazione_Partita',
   data () {
@@ -254,6 +264,7 @@ export default {
       appoggio: [],
       color_list_home: [],
       color_list_away: [],
+      color_nation: [],
       nameImage: [
         '/static/image/icon-sub-blue.png',
         '/static/image/icon-sub-green.png',
@@ -379,6 +390,11 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.coaches = data))
+
+    d3.xml('field.svg', function (xml) {
+      // eslint-disable-next-line no-unused-vars
+      var svgdom = document.body.appendChild(xml.documentElement)
+    })
   },
   methods: {
     setOptionsChampions () {
@@ -414,12 +430,12 @@ export default {
       this.appoggio = []
       this.color_list_away = []
       this.color_list_home = []
+      this.color_nation = []
       this.national_match = []
       var i = 0
       var x = {}
       var y = {}
       var j = {}
-      var m = ''
       if (champ === this.competitions[0].name) {
         this.appoggio = this.italian_team
       } else if (champ === this.competitions[1].name) {
@@ -432,23 +448,22 @@ export default {
         this.appoggio = this.german_team
       } else if (champ === this.competitions[5].name) {
         this.appoggio = this.european_team
-        j = {
-          value: null,
-          text: 'Please select a match'
-        }
-        this.national_match.push(j)
-        for (i = 0; i < this.appoggio.length; i++) {
-          console.log(this.appoggio[i])
-          m = this.appoggio[i].label.split(',')[0]
-          console.log(m)
+        this.national_match = this.matches_European_Championship
+        for (i = 0; i < this.matches_European_Championship.length; i++) {
           j = {
-            value: m,
-            text: m
+            color: '#FFFFFF'
           }
-          this.national_match.push(j)
+          this.color_nation.push(j)
         }
       } else if (champ === this.competitions[6].name) {
         this.appoggio = this.world_team
+        this.national_match = this.matches_World_Cup
+        for (i = 0; i < this.matches_World_Cup.length; i++) {
+          j = {
+            color: '#FFFFFF'
+          }
+          this.color_nation.push(j)
+        }
       }
 
       for (i = 0; i < this.appoggio.length; i++) {
@@ -461,6 +476,30 @@ export default {
         this.color_list_home.push(x)
         this.color_list_away.push(y)
       }
+    },
+    select_match (matchSelected, index) {
+      var i = 0
+      var item0 = Object.keys(matchSelected.teamsData)[0]
+      var item1 = Object.keys(matchSelected.teamsData)[1]
+      var idHome = 0
+      var idAway = 0
+      this.current_match = matchSelected
+      for (i = 0; i < this.color_nation.length; i++) {
+        this.color_nation[i].color = '#FFFFFF'
+      }
+      this.color_nation[index].color = '#FDA5A5'
+      if (matchSelected.teamsData[item0].side === 'home') {
+        idHome = matchSelected.teamsData[item0].teamId
+        idAway = matchSelected.teamsData[item1].teamId
+      } else {
+        idAway = matchSelected.teamsData[item0].teamId
+        idHome = matchSelected.teamsData[item1].teamId
+      }
+      this.home_team = this.get_person(this.teams, idHome)
+      this.away_team = this.get_person(this.teams, idAway)
+
+      this.show_info_match()
+      this.show_formation()
     },
     color_list_item (teamSelected, home, index) {
       var i = 0
@@ -475,21 +514,6 @@ export default {
         }
         this.color_list_away[index].color = '#A5E3FD'
       }
-      /* console.log(this.$refs.home_team[0])
-      if (home === 0) {
-        for (var i = 0; i < this.$refs.home_team; i++) {
-          console.log(this.$refs.home_team[i].textNode)
-          if (this.$refs.home_team[i].text === teamSelected.name) {
-            console.log(this.$refs.home_team[i].name)
-          }
-        }
-      } else {
-        for (var j = 0; i < this.$refs.away_team; i++) {
-          if (this.$refs.away_team[j].text === teamSelected.name) {
-            console.log(this.$refs.away_team[j].name)
-          }
-        }
-      } */
     },
     selectTeam (teamSelected, home, index) {
       if (home === 0) {
@@ -775,12 +799,6 @@ export default {
     }
   },
   watch: {
-    locazione: {
-      handler (newVal) {
-        this.filter_teams()
-      },
-      deep: true // force watching within properties
-    },
     championship: {
       handler (newVal) {
         this.filter_teams()
