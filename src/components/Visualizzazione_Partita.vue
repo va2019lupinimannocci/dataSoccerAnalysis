@@ -13,32 +13,39 @@
             </b-col>
         </b-row>
         <b-row class="field col-up-offset-1 row_team">
-            <b-col cols="3">
-                <h3>Home</h3>
-                <div style="height:450px; background-color: white">
-                    <b-list-group class="teamList">
-                        <b-list-group-item button v-for="(teamData, index) in appoggio" :key="teamData.id" ref="home_team"
-                                           class="d-flex justify-content-between align-items-center"
-                                           v-bind:style=" {backgroundColor:color_list_home[index].color} "
-                                           @click="selectTeam(teamData, 0, index)">
-                            {{teamData.name}}
-                        </b-list-group-item>
-                    </b-list-group>
+            <template v-if="championship.value!=='European Championship'&&championship.value!=='World Cup'">
+                <b-col cols="3">
+                    <h3>Home</h3>
+                    <div style="height:450px; background-color: white">
+                        <b-list-group class="teamList">
+                            <b-list-group-item button v-for="(teamData, index) in appoggio" :key="teamData.id" ref="home_team"
+                                               class="d-flex justify-content-between align-items-center"
+                                               v-bind:style=" {backgroundColor:color_list_home[index].color} "
+                                               @click="selectTeam(teamData, 0, index)">
+                                {{teamData.name}}
+                            </b-list-group-item>
+                        </b-list-group>
+                    </div>
+                </b-col>
+                <b-col cols="3">
+                    <h3>Away</h3>
+                    <div style="height:450px; background-color: white">
+                        <b-list-group class="teamList">
+                            <b-list-group-item button v-for="(teamData, index2) in appoggio" :key="teamData.id" ref="away_team"
+                                               class="d-flex justify-content-between align-items-center"
+                                               v-bind:style=" {backgroundColor:color_list_away[index2].color} "
+                                               @click="selectTeam(teamData, 1, index2)">
+                                {{teamData.name}}
+                            </b-list-group-item>
+                        </b-list-group>
+                    </div>
+                </b-col>
+            </template>
+            <template v-else>
+                <div>
+                    <b-form-select :options="national_match" :select-size="20"></b-form-select>
                 </div>
-            </b-col>
-            <b-col cols="3">
-                <h3>Away</h3>
-                <div style="height:450px; background-color: white">
-                    <b-list-group class="teamList">
-                        <b-list-group-item button v-for="(teamData, index2) in appoggio" :key="teamData.id" ref="away_team"
-                                           class="d-flex justify-content-between align-items-center"
-                                           v-bind:style=" {backgroundColor:color_list_away[index2].color} "
-                                           @click="selectTeam(teamData, 1, index2)">
-                            {{teamData.name}}
-                        </b-list-group-item>
-                    </b-list-group>
-                </div>
-            </b-col>
+            </template>
             <b-col cols="6">
                 <h3>Info match</h3>
                 <div style="height:240px; background-color: #DFDFDF">
@@ -85,7 +92,7 @@
                                     <b-img :key="'home-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
                                 </template>
                             </template>
-                            <template v-if = "players.ownGoals > 0">
+                            <template v-if = "players.ownGoals > 0&&no_own_goal_home===true">
                                 <template v-for="index in parseInt(players.ownGoals)">
                                     <b-img :key="'home-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
                                 </template>
@@ -114,7 +121,7 @@
                                     <b-img :key="'sub-home-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
                                 </template>
                             </template>
-                            <template v-if = "players.ownGoals > 0">
+                            <template v-if = "players.ownGoals > 0&&no_own_goal_home===true">
                                 <template v-for="index in parseInt(players.ownGoals)">
                                     <b-img :key="'sub-home-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
                                 </template>
@@ -156,7 +163,7 @@
                                     <b-img :key="'away-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
                                 </template>
                             </template>
-                            <template v-if = "players.ownGoals > 0">
+                            <template v-if = "players.ownGoals > 0&&no_own_goal_away===false">
                                 <template v-for="index in parseInt(players.ownGoals)">
                                     <b-img :key="'away-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
                                 </template>
@@ -185,7 +192,7 @@
                                     <b-img :key="'sub-away-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
                                 </template>
                             </template>
-                            <template v-if = "players.ownGoals > 0">
+                            <template v-if = "players.ownGoals > 0&&no_own_goal_away===false">
                                 <template v-for="index in parseInt(players.ownGoals)">
                                     <b-img :key="'sub-away-own-goal-'+index" class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
                                 </template>
@@ -226,6 +233,7 @@ export default {
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
       teams: [],
+      national_match: [],
       italian_team: [],
       english_team: [],
       spanish_team: [],
@@ -263,7 +271,9 @@ export default {
       title_match: 'Select two valid team',
       date_match: '',
       gameWeek_match: '',
-      duration_match: ''
+      duration_match: '',
+      no_own_goal_home: false,
+      no_own_goal_away: false
     }
   },
   mounted () {
@@ -398,16 +408,18 @@ export default {
           this.european_team.push(this.teams[i])
         }
       }
-      // console.log(Object.values(this.matches_European_Championship[0].teamsData)[0].teamId)
     },
     filter_teams () {
       var champ = this.championship.value
       this.appoggio = []
       this.color_list_away = []
       this.color_list_home = []
+      this.national_match = []
       var i = 0
       var x = {}
       var y = {}
+      var j = {}
+      var m = ''
       if (champ === this.competitions[0].name) {
         this.appoggio = this.italian_team
       } else if (champ === this.competitions[1].name) {
@@ -420,6 +432,21 @@ export default {
         this.appoggio = this.german_team
       } else if (champ === this.competitions[5].name) {
         this.appoggio = this.european_team
+        j = {
+          value: null,
+          text: 'Please select a match'
+        }
+        this.national_match.push(j)
+        for (i = 0; i < this.appoggio.length; i++) {
+          console.log(this.appoggio[i])
+          m = this.appoggio[i].label.split(',')[0]
+          console.log(m)
+          j = {
+            value: m,
+            text: m
+          }
+          this.national_match.push(j)
+        }
       } else if (champ === this.competitions[6].name) {
         this.appoggio = this.world_team
       }
@@ -531,6 +558,8 @@ export default {
       var coach = ''
       var nm = null
       var index = 0
+      var pointHome = 0
+      var pointAway = 0
       this.playersHome = []
       this.playersSubHome = []
       this.playersAway = []
@@ -540,7 +569,11 @@ export default {
         formazioneHome = this.current_match.teamsData[this.home_team.wyId].formation.lineup
         sostituzioneHome = this.current_match.teamsData[this.home_team.wyId].formation.substitutions
         coach = this.get_person(this.coaches, this.current_match.teamsData[this.home_team.wyId].coachId)
-        this.coachHome = 'Coach: ' + coach.lastName
+        if (this.current_match.teamsData[this.home_team.wyId].coachId !== 0) {
+          this.coachHome = 'Coach: ' + coach.lastName
+        } else {
+          this.coachHome = 'Coach: '
+        }
         for (i = 0; i < formazioneHome.length; i++) {
           p = this.get_person(this.players_data, formazioneHome[i].playerId)
           for (j = 0; j < sostituzioneHome.length; j++) {
@@ -562,6 +595,9 @@ export default {
             playerIn: subIn,
             substitutionMinute: subMin,
             nameImage: nm
+          }
+          if (formazioneHome[i].goals !== 'null') {
+            pointHome = pointHome + parseInt(formazioneHome[i].goals)
           }
           subMin = null
           subIn = null
@@ -590,11 +626,19 @@ export default {
                 substitutionMinute: sostituzioneHome[i].minute,
                 nameImage: this.nameImage[i]
               }
+              if (inp.goals !== 'null') {
+                pointHome = pointHome + parseInt(inp.goals)
+              }
               app.push(x)
             }
           }
         }
         this.playersSubHome = this.orderByRole(app)
+        if (parseInt(this.current_match.teamsData[this.home_team.wyId].score) === pointHome) {
+          this.no_own_goal_home = true
+        } else {
+          this.no_own_goal_home = false
+        }
       }
 
       index = 0
@@ -602,8 +646,13 @@ export default {
       if (this.current_match.teamsData[this.away_team.wyId].hasFormation) {
         formazioneAway = this.current_match.teamsData[this.away_team.wyId].formation.lineup
         sostituzioneAway = this.current_match.teamsData[this.away_team.wyId].formation.substitutions
+
         coach = this.get_person(this.coaches, this.current_match.teamsData[this.away_team.wyId].coachId)
-        this.coachAway = 'Coach: ' + coach.lastName
+        if (this.current_match.teamsData[this.away_team.wyId].coachId !== 0) {
+          this.coachAway = 'Coach: ' + coach.lastName
+        } else {
+          this.coachAway = 'Coach: '
+        }
         for (i = 0; i < formazioneAway.length; i++) {
           p = this.get_person(this.players_data, formazioneAway[i].playerId)
           for (j = 0; j < sostituzioneAway.length; j++) {
@@ -625,6 +674,9 @@ export default {
             playerIn: subIn,
             substitutionMinute: subMin,
             nameImage: nm
+          }
+          if (formazioneAway[i].goals !== 'null') {
+            pointAway = pointAway + parseInt(formazioneAway[i].goals)
           }
           subMin = null
           subIn = null
@@ -654,10 +706,18 @@ export default {
                 nameImage: this.nameImage[i]
               }
               app.push(x)
+              if (inp.goals !== 'null') {
+                pointAway = pointAway + parseInt(inp.goals)
+              }
             }
           }
         }
         this.playersSubAway = this.orderByRole(app)
+        if (pointAway === parseInt(this.current_match.teamsData[this.away_team.wyId].score)) {
+          this.no_own_goal_away = true
+        } else {
+          this.no_own_goal_away = false
+        }
       }
     },
     orderByRole (obj) {
