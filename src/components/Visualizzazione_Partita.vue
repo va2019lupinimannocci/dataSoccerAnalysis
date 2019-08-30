@@ -72,8 +72,6 @@
                     </template>
                 </div>
             </b-col>
-            <b-col>
-            </b-col>
         </b-row>
         <b-row class="col-up-offset-1">
             <b-col cols="6">
@@ -219,13 +217,17 @@
                 </div>
             </b-col>
         </b-row>
-        <b-row class="time col-up-offset-1 col-bt-offset-1">
-            <b-col>
-                <h3>Campo partita</h3>
-                <div style="height:500px; background-color: #ADF2A5"></div>
-                <h5>Slider tempo partita</h5>
-                <div style="height:50px; background-color: #C8FFBD"></div>
-            </b-col>
+        <b-row>
+            <div id="field">
+            </div>
+        </b-row>
+        <b-row>
+            <b-form-input id="timeRange" v-model="timeInterval" type="range"
+                          min="0" max="95" step="0.5"
+                          @input="rangeChanged()"
+            >
+            </b-form-input>
+            <div class="col-bt-offset-1">Time match: {{timeInterval}}</div>
         </b-row>
     </b-container>
 </template>
@@ -284,7 +286,9 @@ export default {
       gameWeek_match: '',
       duration_match: '',
       no_own_goal_home: false,
-      no_own_goal_away: false
+      no_own_goal_away: false,
+
+      timeInterval: 0.5
     }
   },
   mounted () {
@@ -391,10 +395,7 @@ export default {
       .then(res => res.json())
       .then(data => (this.coaches = data))
 
-    d3.xml('field.svg', function (xml) {
-      // eslint-disable-next-line no-unused-vars
-      var svgdom = document.body.appendChild(xml.documentElement)
-    })
+    this.createField()
   },
   methods: {
     setOptionsChampions () {
@@ -796,6 +797,101 @@ export default {
           return obj[i]
         }
       }
+    },
+
+    rangeChanged () {
+      console.log(this.timeInterval)
+    },
+    createField () {
+      var xCoord = 70
+      var fillColor = '#33A616'
+      var lineColor = '#FFFFFF'
+
+      var holder = d3.select('#field') // select the 'body' element
+        .append('svg') // append an SVG element to the body
+        .attr('width', 1100)
+        .attr('height', 550)
+        .style('margin-top', '40px')
+      // draw a rectangle - pitch
+      holder.append('rect') // attach a rectangle
+        .attr('x', xCoord) // position the left of the rectangle
+        .attr('y', 0) // position the top of the rectangle
+        .attr('height', 500) // set the height
+        .attr('width', 1000) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a rectangle - halves
+      holder.append('rect') // attach a rectangle
+        .attr('x', xCoord) // position the left of the rectangle
+        .attr('y', 0) // position the top of the rectangle
+        .attr('height', 500) // set the height
+        .attr('width', 500) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a circle - center circle
+      holder.append('circle') // attach a circle
+        .attr('cx', 500 + xCoord) // position the x-centre
+        .attr('cy', 250) // position the y-centre
+        .attr('r', 50) // set the radius
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', 'none') // set the fill colour
+      // draw a rectangle - penalty area 1
+      holder.append('rect') // attach a rectangle
+        .attr('x', xCoord) // position the left of the rectangle
+        .attr('y', 105) // position the top of the rectangle
+        .attr('height', 290) // set the height
+        .attr('width', 170) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a rectangle - penalty area 2
+      holder.append('rect') // attach a rectangle
+        .attr('x', 830 + xCoord) // position the left of the rectangle
+        .attr('y', 105) // position the top of the rectangle
+        .attr('height', 290) // set the height
+        .attr('width', 170) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a rectangle - six yard box 1
+      holder.append('rect') // attach a rectangle
+        .attr('x', xCoord) // position the left of the rectangle
+        .attr('y', 184) // position the top of the rectangle
+        .attr('height', 132) // set the height
+        .attr('width', 60) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a rectangle - six yard box 2
+      holder.append('rect') // attach a rectangle
+        .attr('x', 940 + xCoord) // position the left of the rectangle
+        .attr('y', 184) // position the top of the rectangle
+        .attr('height', 132) // set the height
+        .attr('width', 60) // set the width
+        .style('stroke-width', 5) // set the stroke width
+        .style('stroke', lineColor) // set the line colour
+        .style('fill', fillColor) // set the fill colour
+      // draw a circle - penalty spot 1
+      holder.append('circle') // attach a circle
+        .attr('cx', 120 + xCoord) // position the x-centre
+        .attr('cy', 250) // position the y-centre
+        .attr('r', 5) // set the radius
+        .style('fill', lineColor) // set the fill colour
+      // draw a circle - penalty spot 2
+      holder.append('circle') // attach a circle
+        .attr('cx', 880 + xCoord) // position the x-centre
+        .attr('cy', 250) // position the y-centre
+        .attr('r', 5) // set the radius
+        .style('fill', lineColor) // set the fill colour
+      // draw a circle - center spot
+      holder.append('circle') // attach a circle
+        .attr('cx', 500 + xCoord) // position the x-centre
+        .attr('cy', 250) // position the y-centre
+        .attr('r', 5) // set the radius
+        .style('fill', lineColor) // set the fill colour
     }
   },
   watch: {
@@ -807,6 +903,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style scoped>
