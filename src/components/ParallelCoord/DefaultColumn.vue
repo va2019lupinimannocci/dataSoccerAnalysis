@@ -2,12 +2,12 @@
   <g class="default-column" v-bind="positioningValues">
     <!-- Column Title -->
     <g class="title">
-      <text fill="black">{{ dimensionKey }}</text>
-      <text fill="black">{{ value | rounded }}</text>
+      <text fill="#17a2b8">{{ dimensionKey }}</text>
+      <text fill="#17a2b8">{{ value | rounded }}</text>
     </g>
 
     <!-- Line -->
-    <line :x1="0" :y1="0" :x2="0" :y2="height" fill="none" stroke="#17a2b8" />
+    <line :x1="0" :y1="0" :x2="0" :y2="height" fill="none" stroke="#006cab" />
 
     <!-- Tick Group -->
     <g class="ticks">
@@ -16,11 +16,11 @@
         v-for="(item, index) in ticks"
         class="tick__text"
         :transform="item.transform"
-        fill="#17a2b8"
+        fill="#006cab"
         :key="index"
       >
         <!-- Tick Line -->
-        <line x1="4" y1="0" x2="10" y2="0" stroke="#17a2b8" stroke-width="1" />
+        <line x1="4" y1="0" x2="10" y2="0" stroke="#006cab" stroke-width="1" />
 
         <!-- Text -->
         <text>{{ item.v }}</text>

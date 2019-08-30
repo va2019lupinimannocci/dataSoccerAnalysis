@@ -12,6 +12,7 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
+    <b-row>
   <div id="app">
     <div class="filter-info">
       <ul v-if="tempNames" class="name-list">
@@ -43,11 +44,18 @@
       />
     </div>
   </div>
+    </b-row>
+    <b-row>
+      <b-col md="6" offset-md="3">
+<bubble></bubble>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
 import ParallelCoord from './components/ParallelCoord/index.vue'
+import bubble from './components/bubble'
 import * as d3 from 'd3'
 import _ from 'lodash'
 
@@ -56,7 +64,8 @@ window.d3 = d3
 export default {
   name: 'App',
   components: {
-    ParallelCoord
+    ParallelCoord,
+    bubble
   },
   filters: {
     asString (object) {
@@ -70,6 +79,7 @@ export default {
   data () {
     return {
       groupNames: [],
+      tempNames2: [],
       $sampleAmount: 100,
       dataset: null,
       ignoredDimensions: ['name', 'id', 'group'],
@@ -166,6 +176,12 @@ export default {
           return 1
         }
       })
+      // manage data for bubble chart
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.tempNames2 = v
+      if (this.tempNames2.length !== 0) {
+        this.prepareListBubbleChart(this.tempNames2)
+      }
       return v
     }
   },
@@ -178,8 +194,46 @@ export default {
       return {
         transition: 'opacity 300ms ease',
         opacity: sameGroup ? 1 : this.activeItem ? 0.15 : 0.55,
-        strokeWidth: sameGroup ? 3 : 1
+        strokeWidth: sameGroup ? 5 : 2
       }
+    },
+    // bubble chart preparation
+    prepareListBubbleChart (array) {
+      var selectElements = [
+        {
+          name: 'Goalkeeper',
+          children: []
+        },
+        {
+          name: 'Defender',
+          children: []
+        },
+        {
+          name: 'Midfielder',
+          children: []
+        },
+        {
+          name: 'Forward',
+          children: []
+        }
+      ]
+      array.forEach((element, index, array) => {
+        var score = 0
+        score = element.pass + element.headpass + element.airduel + element.foul + element.dribbling + element.corner + element.cross + element.kick + element.defense + element.acceleration + element.goal
+        if (element.group === 'Goalkeeper') {
+          selectElements[0]['children'].push({name: element.name, size: score})
+        }
+        if (element.group === 'Defender') {
+          selectElements[1]['children'].push({name: element.name, size: score})
+        }
+        if (element.group === 'Midfielder') {
+          selectElements[2]['children'].push({name: element.name, size: score})
+        }
+        if (element.group === 'Forward') {
+          selectElements[3]['children'].push({name: element.name, size: score})
+        }
+      })
+      console.log(selectElements)
     }
   }
 }
@@ -226,7 +280,7 @@ export default {
   .coords {
     width: 100%;
     height: 100%;
-    background-color: white;
+    background-color: #b4bdc2;
     overflow: visible;
 
     /deep/ text {
@@ -265,7 +319,7 @@ export default {
       &:hover,
       &:active,
       &:focus {
-        color: #0dffa1;
+        color: #17a2b8;
       }
     }
   }
