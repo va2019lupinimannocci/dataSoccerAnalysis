@@ -1,6 +1,6 @@
 <template>
   <div>
-    <svg width="800" height="500">
+    <svg width="1000" height="1000">
       <g
         class="flower"
         v-for="player in layoutData.children"
@@ -10,7 +10,7 @@
         }"
       >
         <circle class="player__circle" :r="player.r" :fill="player.data.color"></circle>
-        <text class="player__label">{{ player.data.name }}</text>
+        <text class="player__label">{{ player.data.name }} {{player.data.amount}}</text>
       </g>
     </svg>
   </div>
@@ -20,6 +20,22 @@
 import { hierarchy, pack } from 'd3-hierarchy'
 export default {
   name: 'bubble',
+  props: {
+    playerSelected: {
+
+      type: Array,
+      default: () => [{
+        name: 'KK',
+        amount: 25,
+        color: '#cc2936'
+      },
+      {
+        name: 'Manolas',
+        amount: 30,
+        color: '#00a03e'
+      }]
+    }
+  },
   data () {
     return {
       players: [
@@ -56,7 +72,7 @@ export default {
     transformedFlowerData () {
       return {
         name: 'Top Level',
-        children: this.players.map(player => ({
+        children: this.playerSelected.map(player => ({
           ...player,
           size: player.amount,
           parent: 'Top Level'
@@ -74,7 +90,7 @@ export default {
 
       // Pack the circles inside the viewbox
       return pack()
-        .size([800, 500])
+        .size([1000, 1000])
         .padding(10)(rootHierarchy)
     }
   }
@@ -83,7 +99,7 @@ export default {
 
 <style>
   body {
-    font: 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    font: 9px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
   }
 
@@ -102,8 +118,8 @@ export default {
   }
 
   .player__label {
-    fill: #fff;
+    fill: black;
     font-weight: bold;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 9px rgba(0, 0, 0, 0.2);
   }
 </style>

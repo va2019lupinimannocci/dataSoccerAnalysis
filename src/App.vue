@@ -47,7 +47,7 @@
     </b-row>
     <b-row>
       <b-col md="6" offset-md="3">
-<bubble></bubble>
+        <bubble :playerSelected ="this.tempNames2"></bubble>
       </b-col>
     </b-row>
   </div>
@@ -82,7 +82,7 @@ export default {
       tempNames2: [],
       $sampleAmount: 100,
       dataset: null,
-      ignoredDimensions: ['name', 'id', 'group'],
+      ignoredDimensions: ['name', 'id', 'group', 'score'],
       allFiltered: null,
       filteredSample: null,
       activeItem: null,
@@ -199,41 +199,24 @@ export default {
     },
     // bubble chart preparation
     prepareListBubbleChart (array) {
-      var selectElements = [
-        {
-          name: 'Goalkeeper',
-          children: []
-        },
-        {
-          name: 'Defender',
-          children: []
-        },
-        {
-          name: 'Midfielder',
-          children: []
-        },
-        {
-          name: 'Forward',
-          children: []
-        }
-      ]
+      var selectElements = []
       array.forEach((element, index, array) => {
-        var score = 0
-        score = element.pass + element.headpass + element.airduel + element.foul + element.dribbling + element.corner + element.cross + element.kick + element.defense + element.acceleration + element.goal
+        // var score = 0
+        // score = element.pass + element.headpass + element.airduel + element.foul + element.dribbling + element.corner + element.cross + element.kick + element.defense + element.acceleration + element.goal
         if (element.group === 'Goalkeeper') {
-          selectElements[0]['children'].push({name: element.name, size: score})
+          selectElements.push({name: element.name, amount: element.score, color: '#1E8361'})
         }
         if (element.group === 'Defender') {
-          selectElements[1]['children'].push({name: element.name, size: score})
+          selectElements.push({name: element.name, amount: element.score, color: '#BF5F00'})
         }
         if (element.group === 'Midfielder') {
-          selectElements[2]['children'].push({name: element.name, size: score})
+          selectElements.push({name: element.name, amount: element.score, color: '#736AB3'})
         }
         if (element.group === 'Forward') {
-          selectElements[3]['children'].push({name: element.name, size: score})
+          selectElements.push({name: element.name, amount: element.score, color: '#D42884'})
         }
       })
-      console.log(selectElements)
+      this.tempNames2 = selectElements
     }
   }
 }
