@@ -275,6 +275,7 @@ export default {
       home_team: {},
       away_team: {},
       current_match: {},
+      current_event: [],
       playersHome: [],
       playersSubHome: [],
       playersAway: [],
@@ -288,7 +289,21 @@ export default {
       no_own_goal_home: false,
       no_own_goal_away: false,
 
-      timeInterval: 0.5
+      timeInterval: 0.5,
+      rangeBase: 1,
+      xCoord: 70,
+      yCoord: 10,
+      fillColor: '#33A616',
+      lineColor: '#AEAEAE',
+      widthRect: 1000,
+      heightRect: 500,
+      events_England: {},
+      events_European_Championship: {},
+      events_France: {},
+      events_Germany: {},
+      events_Italy: {},
+      events_Spain: {},
+      events_World_Cup: {}
     }
   },
   mounted () {
@@ -552,18 +567,34 @@ export default {
       var champ = this.championship.value
       if (champ === this.competitions[0].name) {
         this.current_match = this.find_match(this.matches_Italy)
+        this.filter_events(this.events_Italy)
       } else if (champ === this.competitions[1].name) {
         this.current_match = this.find_match(this.matches_England)
+        this.filter_events(this.events_England)
       } else if (champ === this.competitions[2].name) {
         this.current_match = this.find_match(this.matches_Spain)
+        this.filter_events(this.events_Spain)
       } else if (champ === this.competitions[3].name) {
         this.current_match = this.find_match(this.matches_France)
+        this.filter_events(this.events_France)
       } else if (champ === this.competitions[4].name) {
         this.current_match = this.find_match(this.matches_Germany)
+        this.filter_events(this.events_Germany)
       } else if (champ === this.competitions[5].name) {
         this.current_match = this.find_match(this.matches_European_Championship)
+        this.filter_events(this.events_European_Championship)
       } else if (champ === this.competitions[6].name) {
         this.current_match = this.find_match(this.matches_World_Cup)
+        this.filter_events(this.events_World_Cup)
+      }
+    },
+    filter_events (eventsArray) {
+      var i = 0
+      this.current_event = []
+      for (i = 0; i < eventsArray.length; i++) {
+        if (eventsArray[i].matchId === this.current_match.wyId) {
+          this.current_event.push(eventsArray[i])
+        }
       }
     },
     show_formation () {
@@ -800,98 +831,108 @@ export default {
     },
 
     rangeChanged () {
-      console.log(this.timeInterval)
+      var min = this.timeInterval - this.rangeBase / 2
+      var max = this.timeInterval + this.rangeBase / 2
+      var svg = d3.select('svg')
+      svg.append('image')
+        .attr('xlink:href', '/static/image/icon-goal.png')
+        .attr('width', 20)
+        .attr('height', 20)
+        .attr('x', this.posX(100))
+        .attr('y', this.posY(100))
+    },
+    posX (percentage) {
+      return this.xCoord + percentage * this.widthRect / 100 - 10
+    },
+    posY (percentage) {
+      return this.yCoord + percentage * this.heightRect / 100 - 10
     },
     createField () {
-      var xCoord = 70
-      var fillColor = '#33A616'
-      var lineColor = '#FFFFFF'
-
       var holder = d3.select('#field') // select the 'body' element
         .append('svg') // append an SVG element to the body
-        .attr('width', 1100)
-        .attr('height', 550)
+        .attr('width', this.widthRect + 100)
+        .attr('height', this.heightRect + 50)
         .style('margin-top', '40px')
       // draw a rectangle - pitch
       holder.append('rect') // attach a rectangle
-        .attr('x', xCoord) // position the left of the rectangle
-        .attr('y', 0) // position the top of the rectangle
-        .attr('height', 500) // set the height
-        .attr('width', 1000) // set the width
+        .attr('x', this.xCoord) // position the left of the rectangle
+        .attr('y', this.yCoord) // position the top of the rectangle
+        .attr('height', this.heightRect) // set the height
+        .attr('width', this.widthRect) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a rectangle - halves
       holder.append('rect') // attach a rectangle
-        .attr('x', xCoord) // position the left of the rectangle
-        .attr('y', 0) // position the top of the rectangle
+        .attr('x', this.xCoord) // position the left of the rectangle
+        .attr('y', this.yCoord) // position the top of the rectangle
         .attr('height', 500) // set the height
         .attr('width', 500) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a circle - center circle
       holder.append('circle') // attach a circle
-        .attr('cx', 500 + xCoord) // position the x-centre
-        .attr('cy', 250) // position the y-centre
+        .attr('cx', 500 + this.xCoord) // position the x-centre
+        .attr('cy', 250 + this.yCoord) // position the y-centre
         .attr('r', 50) // set the radius
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
+        .style('stroke', this.lineColor) // set the line colour
         .style('fill', 'none') // set the fill colour
       // draw a rectangle - penalty area 1
       holder.append('rect') // attach a rectangle
-        .attr('x', xCoord) // position the left of the rectangle
-        .attr('y', 105) // position the top of the rectangle
+        .attr('x', this.xCoord) // position the left of the rectangle
+        .attr('y', 105 + this.yCoord) // position the top of the rectangle
         .attr('height', 290) // set the height
         .attr('width', 170) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a rectangle - penalty area 2
       holder.append('rect') // attach a rectangle
-        .attr('x', 830 + xCoord) // position the left of the rectangle
-        .attr('y', 105) // position the top of the rectangle
+        .attr('x', 830 + this.xCoord) // position the left of the rectangle
+        .attr('y', 105 + this.yCoord) // position the top of the rectangle
         .attr('height', 290) // set the height
         .attr('width', 170) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a rectangle - six yard box 1
       holder.append('rect') // attach a rectangle
-        .attr('x', xCoord) // position the left of the rectangle
-        .attr('y', 184) // position the top of the rectangle
+        .attr('x', this.xCoord) // position the left of the rectangle
+        .attr('y', 184 + this.yCoord) // position the top of the rectangle
         .attr('height', 132) // set the height
         .attr('width', 60) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a rectangle - six yard box 2
       holder.append('rect') // attach a rectangle
-        .attr('x', 940 + xCoord) // position the left of the rectangle
-        .attr('y', 184) // position the top of the rectangle
+        .attr('x', 940 + this.xCoord) // position the left of the rectangle
+        .attr('y', 184 + this.yCoord) // position the top of the rectangle
         .attr('height', 132) // set the height
         .attr('width', 60) // set the width
         .style('stroke-width', 5) // set the stroke width
-        .style('stroke', lineColor) // set the line colour
-        .style('fill', fillColor) // set the fill colour
+        .style('stroke', this.lineColor) // set the line colour
+        .style('fill', this.fillColor) // set the fill colour
       // draw a circle - penalty spot 1
       holder.append('circle') // attach a circle
-        .attr('cx', 120 + xCoord) // position the x-centre
+        .attr('cx', 120 + this.xCoord) // position the x-centre
         .attr('cy', 250) // position the y-centre
         .attr('r', 5) // set the radius
-        .style('fill', lineColor) // set the fill colour
+        .style('fill', this.lineColor) // set the fill colour
       // draw a circle - penalty spot 2
       holder.append('circle') // attach a circle
-        .attr('cx', 880 + xCoord) // position the x-centre
-        .attr('cy', 250) // position the y-centre
+        .attr('cx', 880 + this.xCoord) // position the x-centre
+        .attr('cy', 250 + this.yCoord) // position the y-centre
         .attr('r', 5) // set the radius
-        .style('fill', lineColor) // set the fill colour
+        .style('fill', this.lineColor) // set the fill colour
       // draw a circle - center spot
       holder.append('circle') // attach a circle
-        .attr('cx', 500 + xCoord) // position the x-centre
-        .attr('cy', 250) // position the y-centre
+        .attr('cx', 500 + this.xCoord) // position the x-centre
+        .attr('cy', 250 + this.yCoord) // position the y-centre
         .attr('r', 5) // set the radius
-        .style('fill', lineColor) // set the fill colour
+        .style('fill', this.lineColor) // set the fill colour
     }
   },
   watch: {
