@@ -224,7 +224,7 @@
         <b-row>
             <b-form-input id="timeRange" v-model="timeInterval" type="range"
                           min="0" max="100" step="0.5"
-                          @input="load_event_field()"
+                          @change="load_event_field()"
             >
             </b-form-input>
             <div class="col-bt-offset-1">Time match: {{timeInterval}}</div>
@@ -418,7 +418,7 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.events_Italy = data))
-    /* fetch('/static/data/events/events_England.json', {
+    fetch('/static/data/events/events_England.json', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -471,7 +471,7 @@ export default {
 
     })
       .then(res => res.json())
-      .then(data => (this.events_World_Cup = data)) */
+      .then(data => (this.events_World_Cup = data))
 
     this.createField()
   },
@@ -896,62 +896,95 @@ export default {
     },
 
     load_event_field () {
-      var i = 0
-      var min = this.timeInterval - this.rangeBase / 2
-      var max = this.timeInterval + this.rangeBase / 2
-
-      for (i = 0; i < this.current_event.length; i++) {
-        if (min * 60 <= this.current_event[i].eventSec && max * 60 >= this.current_event[i].eventSec) {
-          this.print_event_field(this.current_event[i])
+      if (this.current_match.length !== 0) {
+        var svg = d3.select('svg')
+        svg.selectAll('.previous').remove()
+        var i = 0
+        var min = this.timeInterval - this.rangeBase / 2
+        var max = parseFloat(this.timeInterval) + this.rangeBase / 2
+        for (i = 0; i < this.current_event.length; i++) {
+          if (min * 60 <= this.current_event[i].eventSec && max * 60 >= this.current_event[i].eventSec) {
+            console.log(this.current_event[i])
+            this.print_event_field(this.current_event[i])
+          }
         }
       }
     },
     print_event_field (e) {
       var im = ''
-      //  ['Simple pass', 'High pass', 'Throw in', 'Shot', 'Corner', 'Foul', 'Cross']
-      if (e.subEventName === 'Simple Pass') {
-        im = '/static/image/icon-simple-pass.png'
-        this.append_image(e, im)
-        this.create_line(e)
-      } else if (e.subEventName === 'Throw in') {
-        im = '/static/image/icon-goal.png'
-        this.append_image(e, im)
-        this.create_line(e)
+      var home = false
+      //  ['Throw in', 'Shot', 'Corner', 'Foul']
+      if (e.eventName === 'Offside') {
+        if (e.teamId === this.home_team.wyId) {
+          im = '/static/image/icon-throwin-home.png'
+          home = true
+        } else {
+          im = '/static/image/icon-throwin-away.png'
+          home = false
+        }
+        this.append_image(e, im, home)
+        this.create_line(e, home)
       } else if (e.subEventName === 'Shot') {
-        im = '/static/image/icon-shot.png'
-        this.append_image(e, im)
+        if (e.teamId === this.home_team.wyId) {
+          im = '/static/image/icon-offside-home.png'
+          home = true
+        } else {
+          im = '/static/image/icon-offside-away.png'
+          home = false
+        }
+        this.append_image(e, im, home)
         this.create_line(e)
       } else if (e.subEventName === 'Corner') {
-        im = '/static/image/icon-corner.png'
-        this.append_image(e, im)
+        if (e.teamId === this.home_team.wyId) {
+          im = '/static/image/icon-corner-home.png'
+          home = true
+        } else {
+          im = '/static/image/icon-corner-away.png'
+          home = false
+        }
+        this.append_image(e, im, home)
         this.create_line(e)
       } else if (e.subEventName === 'Foul') {
-        im = '/static/image/icon-foul.png'
-        this.append_image(e, im)
-      } else if (e.subEventName === 'Cross') {
-        im = '/static/image/icon-cross.png'
-        this.append_image(e, im)
-        this.create_line(e)
+        if (e.teamId === this.home_team.wyId) {
+          im = '/static/image/icon-foul-home.png'
+          home = true
+        } else {
+          im = '/static/image/icon-foul-away.png'
+          home = false
+        }
+        this.append_image(e, im, home)
       }
     },
-    append_image (e, im) {
+    append_image (e, im, home) {
       var svg = d3.select('svg')
       svg.append('image')
         .attr('xlink:href', im)
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr('x', this.posX(e.positions[0].x))
-        .attr('y', this.posY(e.positions[0].y))
+        .attr('width', 40)
+        .attr('height', 40)
+        .attr('x', this.posX(e.positions[0].y, home))
+        .attr('y', this.posY(e.positions[0].x, home))
         .attr('class', 'previous')
     },
-    create_line (e) {
-      var svg = d3.select('svg')
+    create_line (e, home) {
+      // var svg = d3.select('svg')
     },
-    posX (percentage) {
-      return this.xCoord + percentage * this.widthRect / 100 - 10
+    posX (percentage, home) {
+      if (home === false) {
+        console.log('fuori casa')
+        return this.xCoord + (100 - percentage) * this.widthRect / 100 - 20
+      } else {
+        console.log(this.xCoord + percentage * this.widthRect / 100 - 20)
+        return this.xCoord + percentage * this.widthRect / 100 - 20
+      }
     },
-    posY (percentage) {
-      return this.yCoord + percentage * this.heightRect / 100 - 10
+    posY (percentage, home) {
+      if (home === false) {
+        console.log('fuori casa')
+        return this.yCoord + (100 - percentage) * this.heightRect / 100 - 20
+      } else {
+        console.log(this.yCoord + percentage * this.heightRect / 100 - 20)
+        return this.yCoord + percentage * this.heightRect / 100 - 20
+      }
     },
     createField () {
       var holder = d3.select('#field') // select the 'body' element
