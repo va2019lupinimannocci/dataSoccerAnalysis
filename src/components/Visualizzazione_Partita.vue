@@ -56,7 +56,7 @@
             <b-col cols="6">
                 <h3>Info match</h3>
                 <div style="height:240px; background-color: #DFDFDF">
-                    <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #FDA5A5">{{title_match}}</h4>
+                    <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5">{{title_match}}</h4>
                     <template v-if = "date_match !== ''">
                         <b-list-group>
                             <b-list-group-item class="info_match" style="text-align: left;">
@@ -76,7 +76,7 @@
         <b-row class="col-up-offset-1">
             <b-col cols="6">
                 <div style="height:900px; background-color: #DFDFDF;">
-                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5;">Home team</h3>
+                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #FDA5A5;">Home team</h3>
                     <template v-if = "coachHome !== ''">
                         <b-list-group class="playerList">
                             <b-list-group-item button class="d-flex align-items-center">
@@ -223,8 +223,8 @@
         </b-row>
         <b-row>
             <b-form-input id="timeRange" v-model="timeInterval" type="range"
-                          min="0" max="95" step="0.5"
-                          @input="rangeChanged()"
+                          min="0" max="100" step="0.5"
+                          @input="load_event_field()"
             >
             </b-form-input>
             <div class="col-bt-offset-1">Time match: {{timeInterval}}</div>
@@ -409,6 +409,69 @@ export default {
     })
       .then(res => res.json())
       .then(data => (this.coaches = data))
+    fetch('/static/data/events/events_Italy.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_Italy = data))
+    /* fetch('/static/data/events/events_England.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_England = data))
+    fetch('/static/data/events/events_European_Championship.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_European_Championship = data))
+    fetch('/static/data/events/events_France.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_France = data))
+    fetch('/static/data/events/events_Germany.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_Germany = data))
+    fetch('/static/data/events/events_Spain.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_Spain = data))
+    fetch('/static/data/events/events_World_Cup.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+
+    })
+      .then(res => res.json())
+      .then(data => (this.events_World_Cup = data)) */
 
     this.createField()
   },
@@ -503,7 +566,7 @@ export default {
       for (i = 0; i < this.color_nation.length; i++) {
         this.color_nation[i].color = '#FFFFFF'
       }
-      this.color_nation[index].color = '#FDA5A5'
+      this.color_nation[index].color = '#A5FDA5'
       if (matchSelected.teamsData[item0].side === 'home') {
         idHome = matchSelected.teamsData[item0].teamId
         idAway = matchSelected.teamsData[item1].teamId
@@ -516,6 +579,7 @@ export default {
 
       this.show_info_match()
       this.show_formation()
+      this.load_event_field()
     },
     color_list_item (teamSelected, home, index) {
       var i = 0
@@ -523,7 +587,7 @@ export default {
         for (i = 0; i < this.color_list_home.length; i++) {
           this.color_list_home[i].color = '#FFFFFF'
         }
-        this.color_list_home[index].color = '#A5FDA5'
+        this.color_list_home[index].color = '#FDA5A5'
       } else {
         for (i = 0; i < this.color_list_away.length; i++) {
           this.color_list_away[i].color = '#FFFFFF'
@@ -562,6 +626,7 @@ export default {
       this.set_current_match()
       this.show_info_match()
       this.show_formation()
+      this.load_event_field()
     },
     set_current_match  () {
       var champ = this.championship.value
@@ -830,16 +895,57 @@ export default {
       }
     },
 
-    rangeChanged () {
+    load_event_field () {
+      var i = 0
       var min = this.timeInterval - this.rangeBase / 2
       var max = this.timeInterval + this.rangeBase / 2
+
+      for (i = 0; i < this.current_event.length; i++) {
+        if (min * 60 <= this.current_event[i].eventSec && max * 60 >= this.current_event[i].eventSec) {
+          this.print_event_field(this.current_event[i])
+        }
+      }
+    },
+    print_event_field (e) {
+      var im = ''
+      //  ['Simple pass', 'High pass', 'Throw in', 'Shot', 'Corner', 'Foul', 'Cross']
+      if (e.subEventName === 'Simple Pass') {
+        im = '/static/image/icon-simple-pass.png'
+        this.append_image(e, im)
+        this.create_line(e)
+      } else if (e.subEventName === 'Throw in') {
+        im = '/static/image/icon-goal.png'
+        this.append_image(e, im)
+        this.create_line(e)
+      } else if (e.subEventName === 'Shot') {
+        im = '/static/image/icon-shot.png'
+        this.append_image(e, im)
+        this.create_line(e)
+      } else if (e.subEventName === 'Corner') {
+        im = '/static/image/icon-corner.png'
+        this.append_image(e, im)
+        this.create_line(e)
+      } else if (e.subEventName === 'Foul') {
+        im = '/static/image/icon-foul.png'
+        this.append_image(e, im)
+      } else if (e.subEventName === 'Cross') {
+        im = '/static/image/icon-cross.png'
+        this.append_image(e, im)
+        this.create_line(e)
+      }
+    },
+    append_image (e, im) {
       var svg = d3.select('svg')
       svg.append('image')
-        .attr('xlink:href', '/static/image/icon-goal.png')
+        .attr('xlink:href', im)
         .attr('width', 20)
         .attr('height', 20)
-        .attr('x', this.posX(100))
-        .attr('y', this.posY(100))
+        .attr('x', this.posX(e.positions[0].x))
+        .attr('y', this.posY(e.positions[0].y))
+        .attr('class', 'previous')
+    },
+    create_line (e) {
+      var svg = d3.select('svg')
     },
     posX (percentage) {
       return this.xCoord + percentage * this.widthRect / 100 - 10
