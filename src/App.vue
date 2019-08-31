@@ -22,6 +22,7 @@
           :style="{ color: colorScale(item.group) }"
           @mouseover="activeItem = item;"
           @mouseleave="activeItem = null;"
+          @click="pushCounterElement(item.id)"
         >
           {{ item.name }}
         </li>
@@ -46,7 +47,22 @@
   </div>
     </b-row>
     <b-row>
-      <b-col md="6" offset-md="3">
+      <b-col sm="4">
+        <h3>Data values of {{this.nameOfThePlayer}}</h3>
+        <b-row><counter :measure="'Pass'" :value="this.valuePass"></counter>
+          <counter :measure="'Head Pass'" :value="this.valueHeadPass"></counter>
+          <counter :measure="'Air Duel'" :value="this.valueAirDuel"></counter>
+          <counter :measure="'Foul'" :value="this.valueFoul"></counter>
+          <counter :measure="'Dribbling'" :value="this.valueDribbling"></counter>
+          <counter :measure="'Corner'" :value="this.valueCorner"></counter></b-row>
+        <b-row><counter :measure="'Cross'" :value="this.valueCross"></counter>
+          <counter :measure="'Kick'" :value="this.valueKick"></counter>
+          <counter :measure="'Defense'" :value="this.valueDefense"></counter>
+          <counter :measure="'Acceleration'" :value="this.valueAcceleration"></counter>
+          <counter :measure="'Goal'" :value="this.valueGoal"></counter>
+        <counter :measure="'Score'" :value="this.valueScore"></counter></b-row>
+      </b-col>
+      <b-col sm="8">
         <bubble :playerSelected ="this.tempNames2"></bubble>
       </b-col>
     </b-row>
@@ -56,6 +72,7 @@
 <script>
 import ParallelCoord from './components/ParallelCoord/index.vue'
 import bubble from './components/bubble'
+import counter from './components/counter'
 import * as d3 from 'd3'
 import _ from 'lodash'
 
@@ -65,7 +82,8 @@ export default {
   name: 'App',
   components: {
     ParallelCoord,
-    bubble
+    bubble,
+    counter
   },
   filters: {
     asString (object) {
@@ -79,13 +97,27 @@ export default {
   data () {
     return {
       groupNames: [],
+      nameOfThePlayer: ' ',
       tempNames2: [],
+      namesForCounter: [],
       $sampleAmount: 100,
       dataset: null,
       ignoredDimensions: ['name', 'id', 'group', 'score'],
       allFiltered: null,
       filteredSample: null,
       activeItem: null,
+      valueGoal: 0,
+      valuePass: 0,
+      valueHeadPass: 0,
+      valueAirDuel: 0,
+      valueFoul: 0,
+      valueDribbling: 0,
+      valueCorner: 0,
+      valueCross: 0,
+      valueKick: 0,
+      valueDefense: 0,
+      valueAcceleration: 0,
+      valueScore: 0,
       testScale: d3
         .scaleLinear()
         .domain([1, 100])
@@ -179,6 +211,8 @@ export default {
       // manage data for bubble chart
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       this.tempNames2 = v
+      // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+      this.namesForCounter = v
       if (this.tempNames2.length !== 0) {
         this.prepareListBubbleChart(this.tempNames2)
       }
@@ -217,6 +251,30 @@ export default {
         }
       })
       this.tempNames2 = selectElements
+    },
+    pushCounterElement (id) {
+      let vm = this
+      console.log(id)
+      this.namesForCounter.forEach(function (player) {
+        if (id === player.id) {
+          console.log(player)
+          vm.valueAcceleration = player.acceleration
+          vm.valueAirDuel = player.airduel
+          vm.valueCorner = player.corner
+          vm.valueCross = player.cross
+          vm.valueDefense = player.defense
+          vm.valueDribbling = player.dribbling
+          vm.valueFoul = player.foul
+          vm.valueGoal = player.goal
+          vm.valueHeadPass = player.headpass
+          vm.valueKick = player.kick
+          vm.valuePass = player.pass
+          vm.valueScore = player.score
+          vm.nameOfThePlayer = player.name
+          console.log(player.pass)
+        }
+      })
+      console.log(this['valuePass'])
     }
   }
 }
