@@ -222,11 +222,13 @@
             </div>
         </b-row>
         <b-row>
-            <b-form-input id="timeRange" v-model="timeInterval" type="range"
-                          min="0" max="100" step="0.5"
-                          @change="load_event_field()"
-            >
-            </b-form-input>
+            <b-input-group prepend="0" append="100" class="mt-3">
+                <b-form-input id="timeRange" v-model="timeInterval" type="range"
+                                             min="0" max="100" step="0.5"
+                                             @change="load_event_field()"
+                >
+                </b-form-input>
+            </b-input-group>
             <div class="col-bt-offset-1">Time match: {{timeInterval}}</div>
         </b-row>
     </b-container>
@@ -900,36 +902,53 @@ export default {
         var svg = d3.select('svg')
         svg.selectAll('.previous').remove()
         var i = 0
-        var min = this.timeInterval - this.rangeBase / 2
-        var max = parseFloat(this.timeInterval) + this.rangeBase / 2
+
         for (i = 0; i < this.current_event.length; i++) {
-          if (min * 60 <= this.current_event[i].eventSec && max * 60 >= this.current_event[i].eventSec) {
+          if (this.check_event_second(this.current_event[i].eventSec, this.current_event[i].matchPeriod, i)) {
             console.log(this.current_event[i])
             this.print_event_field(this.current_event[i])
           }
         }
       }
     },
+    check_event_second (sec, period) {
+      var time = this.timeInterval
+      if (this.timeInterval >= 45) {
+        time = this.timeInterval - 45
+      }
+      var min = time - this.rangeBase / 2
+      var max = parseFloat(time) + this.rangeBase / 2
+
+      if (min * 60 <= sec && max * 60 >= sec) {
+        if (this.timeInterval <= 45 && period === '1H') {
+          return true
+        }
+        if (this.timeInterval >= 45 && period === '2H') {
+          return true
+        }
+      }
+      return false
+    },
     print_event_field (e) {
       var im = ''
       var home = false
-      //  ['Throw in', 'Shot', 'Corner', 'Foul']
-      if (e.eventName === 'Offside') {
+      //  ['Offside', 'Shot', 'Corner', 'Foul']
+      if (e.subEventName === '') {
         if (e.teamId === this.home_team.wyId) {
-          im = '/static/image/icon-throwin-home.png'
+          im = '/static/image/icon-offside-home.png'
           home = true
         } else {
-          im = '/static/image/icon-throwin-away.png'
+          im = '/static/image/icon-offside-away.png'
           home = false
         }
         this.append_image(e, im, home)
         this.create_line(e, home)
       } else if (e.subEventName === 'Shot') {
         if (e.teamId === this.home_team.wyId) {
-          im = '/static/image/icon-offside-home.png'
+          im = '/static/image/icon-shot-home.png'
           home = true
         } else {
-          im = '/static/image/icon-offside-away.png'
+          im = '/static/image/icon-shot-away.png'
           home = false
         }
         this.append_image(e, im, home)
@@ -961,8 +980,8 @@ export default {
         .attr('xlink:href', im)
         .attr('width', 40)
         .attr('height', 40)
-        .attr('x', this.posX(e.positions[0].y, home))
-        .attr('y', this.posY(e.positions[0].x, home))
+        .attr('x', this.posX(e.positions[0].x, home))
+        .attr('y', this.posY(e.positions[0].y, home))
         .attr('class', 'previous')
     },
     create_line (e, home) {
@@ -970,19 +989,15 @@ export default {
     },
     posX (percentage, home) {
       if (home === false) {
-        console.log('fuori casa')
         return this.xCoord + (100 - percentage) * this.widthRect / 100 - 20
       } else {
-        console.log(this.xCoord + percentage * this.widthRect / 100 - 20)
         return this.xCoord + percentage * this.widthRect / 100 - 20
       }
     },
     posY (percentage, home) {
       if (home === false) {
-        console.log('fuori casa')
         return this.yCoord + (100 - percentage) * this.heightRect / 100 - 20
       } else {
-        console.log(this.yCoord + percentage * this.heightRect / 100 - 20)
         return this.yCoord + percentage * this.heightRect / 100 - 20
       }
     },
