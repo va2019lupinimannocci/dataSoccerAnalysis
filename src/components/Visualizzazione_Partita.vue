@@ -12,11 +12,11 @@
                 </b-form-group>
             </b-col>
         </b-row>
-        <b-row class="field col-up-offset-1 row_team">
+        <b-row class="col-up-offset-1 row_team">
             <template v-if="championship.value!=='European Championship'&&championship.value!=='World Cup'">
                 <b-col cols="3">
                     <h3>Home</h3>
-                    <div style="height:450px; background-color: white">
+                    <div style="height:500px; background-color: white">
                         <b-list-group class="teamList">
                             <b-list-group-item button v-for="(teamData, index) in appoggio" :key="teamData.id" ref="home_team"
                                                class="d-flex justify-content-between align-items-center"
@@ -29,7 +29,7 @@
                 </b-col>
                 <b-col cols="3">
                     <h3>Away</h3>
-                    <div style="height:450px; background-color: white">
+                    <div style="height:500px; background-color: white">
                         <b-list-group class="teamList">
                             <b-list-group-item button v-for="(teamData, index2) in appoggio" :key="teamData.id" ref="away_team"
                                                class="d-flex justify-content-between align-items-center"
@@ -55,10 +55,10 @@
             </template>
             <b-col cols="6">
                 <h3>Info match</h3>
-                <div style="height:240px; background-color: #DFDFDF">
-                    <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5">{{title_match}}</h4>
+                <div style="height:240px; background-color: #DFDFDF; border-radius: 5px;">
+                    <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5; border-radius:5px;">{{title_match}}</h4>
                     <template v-if = "date_match !== ''">
-                        <b-list-group>
+                        <b-list-group style=" max-width: 97%; padding-left:1em; pading-right:1em;">
                             <b-list-group-item class="info_match" style="text-align: left;">
                                 {{ date_match }}
                             </b-list-group-item>
@@ -71,12 +71,56 @@
                         </b-list-group>
                     </template>
                 </div>
+                <b-row>
+                    <b-col>
+                        <h3 class ="col-up-offset-1">Symbol legend</h3>
+                    </b-col>
+                </b-row>
+                <div style="background-color: #DFDFDF; border-radius:5px;">
+                    <b-row>
+                        <b-col cols="6">
+                            <b-list-group style="padding-left: 1em; padding-bottom: 1em;" class="col-up-offset-1">
+                                <b-list-group-item class="d-flex justify-content-between align-items-center">
+                                    Goal: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-goal.png" fluid alt="goal" v-b-popover.hover="" title="Goal"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Own goal: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-own-goal.png" fluid alt="goal" v-b-popover.hover="" title="Own goal"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Substitution: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-sub-blue.png" fluid alt="goal" v-b-popover.hover="" title="Substitution"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Yellow card: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-yellow-card.png" fluid alt="goal" v-b-popover.hover="" title="Yellow card"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Red card: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-red-card.png" fluid alt="goal" v-b-popover.hover="" title="Red card"></b-img>
+                                </b-list-group-item>
+                            </b-list-group>
+                        </b-col>
+                        <b-col cols="6">
+                            <b-list-group style="padding-right:1em;" class=" col-up-offset-1">
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Shot: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-shot-away.png" fluid alt="goal" v-b-popover.hover="" title="Shot"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Corner: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-corner-away.png" fluid alt="goal" v-b-popover.hover="" title="Corner"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Offside: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-offside-away.png" fluid alt="goal" v-b-popover.hover="" title="Offside"></b-img>
+                                </b-list-group-item>
+                                <b-list-group-item class="d-flex justify-content-between align-items-center" style="text-align: left;">
+                                    Foul: <b-img class="icon-goal col-lf-offset-1" src="/static/image/icon-foul-away.png" fluid alt="goal" v-b-popover.hover="" title="Foul"></b-img>
+                                </b-list-group-item>
+                            </b-list-group>
+                        </b-col>
+                    </b-row>
+                </div>
             </b-col>
         </b-row>
         <b-row class="col-up-offset-1">
             <b-col cols="6">
-                <div style="height:900px; background-color: #DFDFDF;">
-                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #FDA5A5;">Home team</h3>
+                <div style="height:900px; background-color: #DFDFDF; border-radius:5px;">
+                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #FDA5A5; border-radius:5px;">Home team</h3>
                     <template v-if = "coachHome !== ''">
                         <b-list-group class="playerList">
                             <b-list-group-item button class="d-flex align-items-center">
@@ -146,8 +190,8 @@
                 </div>
             </b-col>
             <b-col cols="6">
-                <div style="height:900px; background-color: #DFDFDF;">
-                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #A5E3FD">Away team</h3>
+                <div style="height:900px; background-color: #DFDFDF; border-radius:5px;">
+                    <h3 style="padding-top:10px; padding-bottom: 10px; background-color: #A5E3FD; border-radius:5px;">Away team</h3>
                     <template v-if = "coachAway !== ''">
                         <b-list-group class="playerList">
                             <b-list-group-item button class="d-flex align-items-center">
@@ -231,6 +275,18 @@
             </b-input-group>
             <div class="col-bt-offset-1">Time match: {{timeInterval}}</div>
         </b-row>
+        <b-row>
+            <p style="border: 1px solid; border-radius: 5px; padding: 1em;">
+                This view shows the data related to a single match. It was designed for a TV viewer or for football programs.
+                It is therefore necessary to select two teams (in the case of a club championship) or directly a match (in the case of national teams).
+                In the first case, in fact, every team has played against every other team, while in the case of Europeans or the World Cup, not all teams compete against each other.
+                Once the match has been selected, it is possible to view the information on the match in the upper right-hand tab.
+                In the lower part, instead, it appears the lineup of the match, and the substitutions made.
+                For each player, goals, own goals, substitutions, yellow and red cards are displayed.
+                Finally in the final part it is possible to scroll a cursor indicating the time of the game, and consequently display some events that occurred during the game: corners, offsides, fouls and shots.
+                The colors in this case relate to the two teams: red for the home team and blue for the away team.
+            </p>
+        </b-row>
     </b-container>
 </template>
 
@@ -272,7 +328,8 @@ export default {
       nameImage: [
         '/static/image/icon-sub-blue.png',
         '/static/image/icon-sub-green.png',
-        '/static/image/icon-sub-violet.png'
+        '/static/image/icon-sub-violet.png',
+        'static/image/icon-sub-orange.png'
       ],
       home_team: {},
       away_team: {},
@@ -942,7 +999,6 @@ export default {
           home = false
         }
         this.append_image(e, im, home)
-        this.create_line(e, home)
       } else if (e.subEventName === 'Shot') {
         if (e.teamId === this.home_team.wyId) {
           im = '/static/image/icon-shot-home.png'
@@ -952,7 +1008,6 @@ export default {
           home = false
         }
         this.append_image(e, im, home)
-        this.create_line(e)
       } else if (e.subEventName === 'Corner') {
         if (e.teamId === this.home_team.wyId) {
           im = '/static/image/icon-corner-home.png'
@@ -962,7 +1017,6 @@ export default {
           home = false
         }
         this.append_image(e, im, home)
-        this.create_line(e)
       } else if (e.subEventName === 'Foul') {
         if (e.teamId === this.home_team.wyId) {
           im = '/static/image/icon-foul-home.png'
@@ -983,9 +1037,6 @@ export default {
         .attr('x', this.posX(e.positions[0].x, home))
         .attr('y', this.posY(e.positions[0].y, home))
         .attr('class', 'previous')
-    },
-    create_line (e, home) {
-      // var svg = d3.select('svg')
     },
     posX (percentage, home) {
       if (home === false) {
@@ -1112,15 +1163,11 @@ export default {
     .col-lf-offset-1 {
         margin-left: 1em;
     }
-
-    .text-align {
-        text-align: left;
-    }
     h4 {
         font-size: 20px;
     }
     .teamList {
-         max-height: 450px;
+         max-height: 600px;
          margin-bottom: 10px;
          overflow: scroll;
          -webkit-overflow-scrolling: touch;
@@ -1136,7 +1183,7 @@ export default {
         font-size: 20px;
     }
     .row_team {
-        height: 500px;
+        height: 650px;
     }
 
     .icon-goal {
