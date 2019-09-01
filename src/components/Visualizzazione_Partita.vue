@@ -302,7 +302,9 @@ export default {
         value: 'Italy',
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
+      // contiene tutti i team e le loro informazioni
       teams: [],
+      // contengono i team divisi per campionato, vengono settati on load page
       national_match: [],
       italian_team: [],
       english_team: [],
@@ -311,6 +313,8 @@ export default {
       german_team: [],
       european_team: [],
       world_team: [],
+
+      // contengono i match divisi per campionato
       matches_England: {},
       matches_European_Championship: {},
       matches_France: {},
@@ -318,44 +322,80 @@ export default {
       matches_Italy: {},
       matches_Spain: {},
       matches_World_Cup: {},
+
+      // contiene i vari tipi di competizioni, serve per creare il menù in alto
       competitions: [],
+
+      // contiene tutti i giocatori
       players_data: {},
+      // contiene tutti i coaches
       coaches: {},
+      // array di appoggio, contiene i teams da mostrare ad ogni nuovo campionato selezionato
       appoggio: [],
+
+      // contengono i background color delle liste o dei match (nazionali) o dei team (club), servono per fare il v-bind quando si seleziona un team o match
       color_list_home: [],
       color_list_away: [],
       color_nation: [],
+
+      // array che contiene i src delle iconi delle sostituzioni, usato per visualizzare icone di colore diverso per ogni sostituzione
       nameImage: [
         '/static/image/icon-sub-blue.png',
         '/static/image/icon-sub-green.png',
         '/static/image/icon-sub-violet.png',
         'static/image/icon-sub-orange.png'
       ],
+
+      // contengono il team in casa e fuori casa selezionato del match
       home_team: {},
       away_team: {},
+
+      // contiene il match corrente (uno solo)
       current_match: {},
+      // contiene gli eventi del match correnti
       current_event: [],
+
+      // contengono le lineup e le sostituzioni delle due squadre selezionate
       playersHome: [],
       playersSubHome: [],
       playersAway: [],
       playersSubAway: [],
+
+      // allenatori visualizzati, possono rimanere vuote, perché non in tutti i match è riportato l'allenatore
       coachHome: '',
       coachAway: '',
+
+      // info match visualizzate
       title_match: 'Select two valid team',
       date_match: '',
       gameWeek_match: '',
       duration_match: '',
+
+      // gli autogoals hanno degli errori nei dati dei file JSON: ovvero sono corretti se effettivamente c'è stato un autogoal nella partita,
+      // ma non lo sono e sono settati casualmente se non ci sono stati autogoal nella partita
+      // queste due variabili tengono di conto se ci sono stati autogol nella partita nelle due squadre e in base a questo gli autogoal sono
+      // visualizzati o meno. Per verificare se ci siano stati autogoal o meno, viene confrontato il risultato finale della partita con
+      // i goal fatti, se c'è uno scarto, i goal mancanti sono degli autogoal e allora possono essere visualizzati
       no_own_goal_home: false,
       no_own_goal_away: false,
 
+      // valore dello slider
       timeInterval: 0.5,
+      // ampiezza dell'intervallo con cui vengono visualizzati gli eventi sul campo
       rangeBase: 1,
+
+      // coordinate del campo nel svg, tutto deve essere shiftato di questi valori
       xCoord: 70,
       yCoord: 20,
+      // colore del campo da calcio
       fillColor: '#33A616',
+      // colore delle linee del campo da calcio
       lineColor: '#AEAEAE',
+      // dimensioni campo da calcio
       widthRect: 1000,
       heightRect: 500,
+
+      // contengono gli eventi divisi per campionato
       events_England: {},
       events_European_Championship: {},
       events_France: {},
@@ -532,9 +572,11 @@ export default {
       .then(res => res.json())
       .then(data => (this.events_World_Cup = data))
 
+    // crea il campo da calcio con d3
     this.createField()
   },
   methods: {
+    // setta i valuese e options del menù dei campionati
     setOptionsChampions () {
       var output = []
       for (var i = 0; i < this.competitions.length; i++) {
@@ -543,6 +585,8 @@ export default {
       this.championship.value = this.competitions[0].name
       this.championship.options = output
     },
+
+    // suddivide i team nei vari array, gli array delle nazionali non verranno poi usati, perché viene visualizzato direttamente il match
     division_team () {
       for (var i = 0; i < this.teams.length; i++) {
         if (this.teams[i].type === 'club') {
@@ -563,6 +607,10 @@ export default {
         }
       }
     },
+
+    // on load page, dopo aver caricato i campionati e ogni volta che viene cambiato il valore del campionato selezionato
+    // viene chiamata questa funzione che resetta gli array dei colori, l'array di appoggio e lo setta per il nuovo
+    // campionato selezionato, nel caso di campionati per club e nel caso delle nazionali
     filter_teams () {
       var champ = this.championship.value
       this.appoggio = []
@@ -615,6 +663,10 @@ export default {
         this.color_list_away.push(y)
       }
     },
+
+    // SOLO NAZIONALI!! DIRETTAMENTE SELEZIONATO IL MATCH
+    // funzione chiamata ogni volta che viene cliccato un team: colora l'item della lista relativo al team selezionato (e ovviamente fa tornare bianco
+    // il team selezionato precedentemente). Estrae dal match selezionato i due team, così da ricondursi al caso del campionato da club
     select_match (matchSelected, index) {
       var i = 0
       var item0 = Object.keys(matchSelected.teamsData)[0]
@@ -626,6 +678,9 @@ export default {
         this.color_nation[i].color = '#FFFFFF'
       }
       this.color_nation[index].color = '#A5FDA5'
+
+      // il primo o il secondo team potrebbero essere il team in casa o fuori casa, per saperlo è necessario prima accedere il team e poi
+      // guardare la proprietà 'side'
       if (matchSelected.teamsData[item0].side === 'home') {
         idHome = matchSelected.teamsData[item0].teamId
         idAway = matchSelected.teamsData[item1].teamId
@@ -638,8 +693,22 @@ export default {
 
       this.show_info_match()
       this.show_formation()
+
+      // Chiamo la filter_events, che filtra gli eventi dal file passato, selezionando solo queli del match corrente
+      if (this.championship.value === this.competitions[5].name) {
+        this.current_match = this.find_match(this.matches_European_Championship)
+        this.filter_events(this.events_European_Championship)
+      } else {
+        this.current_match = this.find_match(this.matches_World_Cup)
+        this.filter_events(this.events_World_Cup)
+      }
+
+      // Anche all'inizio, prima che il cursore del range venga cambiato carico gli eventi del match attuale, se ve ne sono
       this.load_event_field()
     },
+
+    // SOLO CLUB
+    // colora l'item della lista del club selezionato
     color_list_item (teamSelected, home, index) {
       var i = 0
       if (home === 0) {
@@ -654,6 +723,9 @@ export default {
         this.color_list_away[index].color = '#A5E3FD'
       }
     },
+
+    // SOLO CLUB!! NO NAZIONALI Vedi selectMatch()
+    // Funzione chiamata ogni volta che si seleziona un team, anche nel caso in cui sia stato selezionato un solo team e l'altro ancora no
     selectTeam (teamSelected, home, index) {
       if (home === 0) {
         this.home_team = teamSelected
@@ -663,11 +735,14 @@ export default {
 
       this.color_list_item(teamSelected, home, index)
 
+      // Caso in cui ho selezionato un team per primo e l'altro non è ancora stato selezionato
       if ((Object.keys(this.home_team).length === 0) || (Object.keys(this.away_team).length === 0)) {
         this.title_match = 'Select the second team'
         console.log('Selezionare due squadre')
         return
       }
+
+      // Caso in cui i due team selezionati sono uguali, elimino tutte le informazioni visualizzate
       if (this.home_team.name === this.away_team.name) {
         this.title_match = 'Select two different teams'
         this.date_match = ''
@@ -687,6 +762,10 @@ export default {
       this.show_formation()
       this.load_event_field()
     },
+
+    // SOLO CLUB!! NO NAZIONALI filter_events() chiamata dentro la selct_match()
+    // Setta il match corrente, in base al campionato selezionato e poi sempre in base al campionato selezionato
+    // fa un filtro chiamando la funzione, per selezionare solo gli eventi del match corrente
     set_current_match  () {
       var champ = this.championship.value
       if (champ === this.competitions[0].name) {
@@ -704,14 +783,10 @@ export default {
       } else if (champ === this.competitions[4].name) {
         this.current_match = this.find_match(this.matches_Germany)
         this.filter_events(this.events_Germany)
-      } else if (champ === this.competitions[5].name) {
-        this.current_match = this.find_match(this.matches_European_Championship)
-        this.filter_events(this.events_European_Championship)
-      } else if (champ === this.competitions[6].name) {
-        this.current_match = this.find_match(this.matches_World_Cup)
-        this.filter_events(this.events_World_Cup)
       }
     },
+
+    // Filtra gli eventi, selezionando dall'array passato solamente gli eventi relativi al match corrente e li mette in current_event
     filter_events (eventsArray) {
       var i = 0
       this.current_event = []
@@ -721,6 +796,9 @@ export default {
         }
       }
     },
+
+    // CLUB E NAZIONALI
+    // Compie le medesime operazioni due volte, una per la squadra in casa e una per quella fuori casa
     show_formation () {
       var formazioneHome = {}
       var sostituzioneHome = {}
@@ -745,15 +823,24 @@ export default {
       this.playersAway = []
       this.playersSubAway = []
 
+      // Non tutti i match riportano la formazione
       if (this.current_match.teamsData[this.home_team.wyId].hasFormation) {
         formazioneHome = this.current_match.teamsData[this.home_team.wyId].formation.lineup
         sostituzioneHome = this.current_match.teamsData[this.home_team.wyId].formation.substitutions
+
+        // Seleziona il coach, che non necessariamente è riportato, ritrova i dati relativi all'id passato,
+        // tramite la get_person()
         coach = this.get_person(this.coaches, this.current_match.teamsData[this.home_team.wyId].coachId)
         if (this.current_match.teamsData[this.home_team.wyId].coachId !== 0) {
           this.coachHome = 'Coach: ' + coach.lastName
         } else {
           this.coachHome = 'Coach: '
         }
+
+        // Scorrendo tutti i giocatori della lineup, ottiene i dati per ogni giocatore e se il giocatore è stato sostituito,
+        // ovvero è fra i giocatori presenti nell'array delle sostituzioni, salvo le informazioni relative al minuto della sostituzione
+        // setto l'icona della sostituzione (diversa per ogni sostituzione) e aggiorno index che è appunto l'indice per non
+        // utilizzare la stessa icona per due diverse sostituzioni
         for (i = 0; i < formazioneHome.length; i++) {
           p = this.get_person(this.players_data, formazioneHome[i].playerId)
           for (j = 0; j < sostituzioneHome.length; j++) {
@@ -776,6 +863,9 @@ export default {
             substitutionMinute: subMin,
             nameImage: nm
           }
+
+          // pointHome tiene la somma dei goal fatti dai giocatori, confrontato alla fine dell'array con il punteggio finale, per verificare
+          // se mancano dei goal, in quel caso sono da tenere in considerazione gli autogoal (vedi errore nei dati)
           if (formazioneHome[i].goals !== 'null') {
             pointHome = pointHome + parseInt(formazioneHome[i].goals)
           }
@@ -784,8 +874,10 @@ export default {
           nm = null
           app.push(x)
         }
+        // ordino i giocatori in base al ruolo, dal portiere all'attacco
         this.playersHome = this.orderByRole(app)
 
+        // Qui estraggo le informazioni relative ai giocatori che entrano a partita in corso: le sostituzioni
         index = 0
         app = []
         bench = this.current_match.teamsData[this.home_team.wyId].formation.bench
@@ -814,6 +906,8 @@ export default {
           }
         }
         this.playersSubHome = this.orderByRole(app)
+
+        // Controllo se i goal totali dei giocatori coincidono con il punteggio finale, per sapere se considerare gli autogoal o meno
         if (parseInt(this.current_match.teamsData[this.home_team.wyId].score) === pointHome) {
           this.no_own_goal_home = true
         } else {
@@ -900,6 +994,8 @@ export default {
         }
       }
     },
+
+    // Ordina in base al ruolo
     orderByRole (obj) {
       var i
       var arr = []
@@ -927,6 +1023,8 @@ export default {
       }
       return arr
     },
+
+    // Aggiorna le info mostrate del match
     show_info_match () {
       var d = ''
       this.title_match = this.current_match.label
@@ -935,6 +1033,10 @@ export default {
       this.gameWeek_match = 'Game week: ' + this.current_match.gameweek
       this.duration_match = 'Duration match: ' + this.current_match.duration
     },
+
+    // Date due squadre e l'array passato dei match, in base al campionato selezionato, trovail match corrispondente, considerando,
+    // nel secondo if, che ci sono due match (solo nel caso dei club), che coinvologono le due squadre selezionate, la partita di andata
+    // e quella di ritorno
     find_match (obj) {
       var homeId = this.home_team.wyId
       var awayId = this.away_team.wyId
@@ -946,6 +1048,8 @@ export default {
         }
       }
     },
+
+    // Dato un'array in cui cercare un oggetto, lo trova sulla base dell'id passato
     get_person (obj, id) {
       for (var i = 0; i < obj.length; i++) {
         if (obj[i].wyId === id) {
@@ -954,6 +1058,8 @@ export default {
       }
     },
 
+    // Per ogni evento del match, controlla se è relativo al minuto selezionato e nel caso chiama la funzione che crea l'icona
+    // Rimuove le icone che sono attualmente presenti nel campo
     load_event_field () {
       if (this.current_match.length !== 0) {
         var svg = d3.select('svg')
@@ -968,6 +1074,9 @@ export default {
         }
       }
     },
+
+    // Controlla che l'evento selezionato sia da mostrare. I secondi nei dati sono segnati a partire dall'inizio della metà del tempo,
+    // ovvero si riazzerano con il secondo tempo
     check_event_second (sec, period) {
       var time = this.timeInterval
       if (this.timeInterval >= 45) {
@@ -986,6 +1095,8 @@ export default {
       }
       return false
     },
+
+    // Stampa l'icona, selezionando quella del colore giusta in base a quale squadra appartiene l'evento selezionato
     print_event_field (e) {
       var im = ''
       var home = false
@@ -1028,6 +1139,8 @@ export default {
         this.append_image(e, im, home)
       }
     },
+
+    // Crea l'immagine nel campo da calcio
     append_image (e, im, home) {
       var svg = d3.select('svg')
       svg.append('image')
@@ -1038,6 +1151,11 @@ export default {
         .attr('y', this.posY(e.positions[0].y, home))
         .attr('class', 'previous')
     },
+
+    // Le due funzioni ritornano la posizione sull'asse X e Y coretta nel svg
+    // Nel caso degli eventi fuori casa è necessario correggerre con (100-percentage), perché nei dati le coordinate sono date rispetto all'attaccante
+    // dunque cambiano in base al fatto che un evento appartenga a una squadra o all'altra
+    // -20 è un fattore di scala per via della presenza delle linee del campo
     posX (percentage, home) {
       if (home === false) {
         return this.xCoord + (100 - percentage) * this.widthRect / 100 - 20
@@ -1052,8 +1170,10 @@ export default {
         return this.yCoord + percentage * this.heightRect / 100 - 20
       }
     },
+
+    // Crea il campo da calcio con d3
     createField () {
-      var holder = d3.select('#field') // select the 'body' element
+      var holder = d3.select('#field') // select the element
         .append('svg') // append an SVG element to the body
         .attr('width', this.widthRect + 100)
         .attr('height', this.heightRect + 50)
