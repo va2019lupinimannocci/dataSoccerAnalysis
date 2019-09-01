@@ -58,7 +58,7 @@
                 <div style="height:240px; background-color: #DFDFDF; border-radius: 5px;">
                     <h4 style="padding-top:10px; padding-bottom: 10px; background-color: #A5FDA5; border-radius:5px;">{{title_match}}</h4>
                     <template v-if = "date_match !== ''">
-                        <b-list-group style=" max-width: 97%; padding-left:1em; pading-right:1em;">
+                        <b-list-group style=" max-width: 97%; padding-left:1em;">
                             <b-list-group-item class="info_match" style="text-align: left;">
                                 {{ date_match }}
                             </b-list-group-item>
@@ -269,7 +269,7 @@
             <b-input-group prepend="0" append="100" class="mt-3">
                 <b-form-input id="timeRange" v-model="timeInterval" type="range"
                                              min="0" max="100" step="0.5"
-                                             @change="load_event_field()"
+                                             @input="load_event_field()"
                 >
                 </b-form-input>
             </b-input-group>
@@ -351,7 +351,7 @@ export default {
       timeInterval: 0.5,
       rangeBase: 1,
       xCoord: 70,
-      yCoord: 10,
+      yCoord: 20,
       fillColor: '#33A616',
       lineColor: '#AEAEAE',
       widthRect: 1000,
