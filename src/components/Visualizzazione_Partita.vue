@@ -285,6 +285,7 @@
                 For each player, goals, own goals, substitutions, yellow and red cards are displayed.
                 Finally in the final part it is possible to scroll a cursor indicating the time of the game, and consequently display some events that occurred during the game: corners, offsides, fouls and shots.
                 The colors in this case relate to the two teams: red for the home team and blue for the away team.
+                Not all events are displayed, as the files containing all the events would have been too large for a fetch executed on page loading.
             </p>
         </b-row>
     </b-container>
