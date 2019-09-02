@@ -70,6 +70,24 @@
         <bubble :playerSelected ="this.tempNames2"></bubble>
       </b-col>
     </b-row>
+    <b-row>
+      <b-col style="text-align: center;">
+        <h3>Visualization Description</h3>
+        <div class="description" style="font-size: 18px">
+          <p>This visualization, based on measure selected, has the scope to help the D.S. manager to check what are the football player that have a certain skills.
+            In particular this is for market reasons, because every D.S. has the possibility to check what are the players that the team need.</p>
+          <p>In the first part of the visualization there is the table in which we have all the possible measure over which we can filter players,
+            with a list that let the viewer see who are the player in that specific measures's ranges. Clicking over a name inside the list will render on card on bottom the exact values
+          of the player in all the measures.</p>
+          <p>In the second part of visualization there is also the bubble chart which display all players in different size of bubbles based on player score (precomputed).
+          This has the aim to improve in a visual way the research of the best player inside all the other obtained by the list.
+          In the visualization there are 4 kinds of colours based on role: <p style="color:#1E8361">GoalKeeper</p> <p style="color:#BF5F00">Defense</p> <p style="color:#736AB3"> Midfielder</p> <p style="color:#D42884">Forward</p>
+          <p>The data are precomputed inside Anaconda, for each player has been extracted all the metrics available
+            inside the visualization, then an interpolation has been applied in order to have all the metrics between values 0 and 100.</p>
+
+        </div>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -379,5 +397,12 @@ export default {
 
   ::-webkit-scrollbar-thumb {
     background-color: #17a2b8;
+  }
+  .description{
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
   }
 </style>
