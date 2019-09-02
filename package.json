@@ -12,8 +12,11 @@
   },
   "dependencies": {
     "bootstrap-vue": "^2.0.0-rc.27",
+    "crossfilter2": "^1.4.7",
     "d3": "^5.9.7",
-    "vue": "^2.5.2"
+    "normalize.css": "^8.0.1",
+    "vue": "^2.5.2",
+    "vue-radar": "^0.1.5"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
