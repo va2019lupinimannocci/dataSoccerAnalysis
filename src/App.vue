@@ -47,22 +47,26 @@
   </div>
     </b-row>
     <b-row>
-      <b-col sm="4">
+      <b-col style="text-align: center;">
         <h3>Data values of {{this.nameOfThePlayer}}</h3>
-        <b-row><counter :measure="'Pass'" :value="this.valuePass"></counter>
+      </b-col>
+    </b-row>
+    <b-row style="margin-left: 22%;">
+          <counter :measure="'Pass'" :value="this.valuePass"></counter>
           <counter :measure="'Head Pass'" :value="this.valueHeadPass"></counter>
           <counter :measure="'Air Duel'" :value="this.valueAirDuel"></counter>
           <counter :measure="'Foul'" :value="this.valueFoul"></counter>
           <counter :measure="'Dribbling'" :value="this.valueDribbling"></counter>
-          <counter :measure="'Corner'" :value="this.valueCorner"></counter></b-row>
-        <b-row><counter :measure="'Cross'" :value="this.valueCross"></counter>
+          <counter :measure="'Corner'" :value="this.valueCorner"></counter>
+          <counter :measure="'Cross'" :value="this.valueCross"></counter>
           <counter :measure="'Kick'" :value="this.valueKick"></counter>
           <counter :measure="'Defense'" :value="this.valueDefense"></counter>
           <counter :measure="'Acceleration'" :value="this.valueAcceleration"></counter>
           <counter :measure="'Goal'" :value="this.valueGoal"></counter>
-        <counter :measure="'Score'" :value="this.valueScore"></counter></b-row>
-      </b-col>
-      <b-col sm="8">
+        <counter :measure="'Score'" :value="this.valueScore"></counter>
+    </b-row>
+    <b-row>
+      <b-col>
         <bubble :playerSelected ="this.tempNames2"></bubble>
       </b-col>
     </b-row>
