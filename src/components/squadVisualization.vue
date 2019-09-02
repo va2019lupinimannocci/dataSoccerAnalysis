@@ -139,7 +139,7 @@ export default {
         options: ['France', 'Germany', 'Italy', 'Spain', 'England']
       },
       booleanoss: false,
-      isHidden: true,
+      isHidden: false,
       teams: [],
       dimension: 'select a measure',
       appoggio: [],
