@@ -23,8 +23,8 @@
             between club team (and all the major leauges available from data) or national team. Once
             the team manager find his team, he could check his team's stats and understand those skills
             that are needed to improve.
-            In the second part of the visualization instead is possibile to check, regarding different measures,
-            the screenshoot of all the contender inside the same league.
+            In the second part of the visualization instead is possible to check, regarding different measures,
+            the screen-shot of all the contender inside the same league.
             The measure considered are: Goal, Number of Passes, Air Duel, Number of Foul, Dribbling, Corner, Cross, Defense.
             The data are precomputed inside Anaconda, for each team has been extracted all the metrics available
             inside the visualization, then an interpolation has been applied in order to have all the metrics between values 0 and 100.
