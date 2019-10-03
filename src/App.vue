@@ -12,7 +12,84 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-      <div>
+    <div>
+      <b-row>
+        <b-col offset-md="2"  md="8">
+          <p class="section" style="font-size: 20px;">
+            This project has been developed by <strong>Lorenzo Mannocci</strong> and <strong>Matteo Lupini</strong> during the Laurea Magistrale in Data Science And Business Informatics,
+            for the course of <strong>Visual Analytics</strong>, held by the professor <strong>Salvatore Rinzivillo</strong>.
+          </p>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col col="6" style="margin-left:2em; margin-right:2em;">
+          <b-card no-body class="overflow-hidden" style="max-width: 100%; height:450px;">
+            <b-row no-gutters>
+              <b-col md="6">
+                <b-card-img src="/static/image/lorenzo_mannocci.JPG" class="rounded-0"></b-card-img>
+              </b-col>
+              <b-col md="6">
+                <b-card-body title="Lorenzo Mannocci">
+                  <b-card-text class="card-content">
+                    <b-list-group class="card-content">
+                      <b-list-group-item>
+                        <p>Laurea triennale: </p>
+                        <p style="font-weight: bold;">Ingegneria Informatica</p>
+                      </b-list-group-item>
+                      <b-list-group-item>
+                        <p>Laurea magistrale: </p>
+                        <p style="font-weight: bold;">Data Science And Business Informatics</p>
+                      </b-list-group-item>
+                      <b-list-group-item>
+                        <b-link href="https://www.linkedin.com/in/lorenzo-mannocci/" target="_blank">
+                          <b-img src="/static/image/linkedin.png" fluid alt="linkedin" style="height:40px;"></b-img>
+                        </b-link>
+                      </b-list-group-item>
+                    </b-list-group>
+                    <p style="font-weight:bold; font-size:15px; margin-top: 20px;">
+                      mannocci.lore@gmail.com
+                    </p>
+                  </b-card-text>
+                </b-card-body>
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
+        <b-col col="6" style="margin-right:2em;">
+          <b-card no-body class="overflow-hidden" style="max-width: 100%; height:450px;">
+            <b-row no-gutters>
+              <b-col md="6">
+                <b-card-img src="/static/image/matteo_lupini.jpeg" class="rounded-0"></b-card-img>
+              </b-col>
+              <b-col md="6">
+                <b-card-body title="Matteo Lupini">
+                  <b-card-text class="card-content">
+                    <b-list-group class="card-content">
+                      <b-list-group-item>
+                        <p>Laurea triennale: </p>
+                        <p style="font-weight: bold;">Informatica</p>
+                      </b-list-group-item>
+                      <b-list-group-item>
+                        <p>Laurea magistrale: </p>
+                        <p style="font-weight: bold;">Data Science And Business Informatics</p>
+                      </b-list-group-item>
+                      <b-list-group-item>
+                        <b-link href="http://linkedin.com/in/matteo-lupini-7a6052158" target="_blank">
+                          <b-img src="/static/image/linkedin.png" fluid alt="linkedin" style="height:40px;"></b-img>
+                        </b-link>
+                      </b-list-group-item>
+                    </b-list-group>
+                    <p style="font-weight:bold; font-size:15px; margin-top: 20px;">
+                      matteo.lupini5@gmail.com
+                    </p>
+                  </b-card-text>
+                </b-card-body>
+              </b-col>
+            </b-row>
+          </b-card>
+        </b-col>
+      </b-row>
+    </div>
         <div class="section">
           <h4>Visualizzazione squadre</h4>
           <b-img src="/static/image/visualizzazione_squadre.JPG" fluid alt="Responsive image"></b-img>
@@ -46,7 +123,7 @@
             </p>
         </div>
         <div class="section">
-          <h4>Visualizzazione partita</h4>
+          <h4>Visualizzazione giocatore</h4>
           <b-img src="/static/image/visualizzazione_giocatore.png" fluid alt="Responsive image"></b-img>
           <p>
             This visualization, based on measure selected, has the scope to help the D.S. manager to check what are the football player that have a certain skills.
@@ -60,7 +137,6 @@
           </p>
         </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -91,5 +167,14 @@ export default {
     padding-top: 2em;
     padding-left: 2em;
     padding-right: 2em;
+  }
+  .card-content p{
+    padding-top: 0px;
+    margin-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .card-content, b-card-body {
+    padding-top: 10px;
   }
 </style>
