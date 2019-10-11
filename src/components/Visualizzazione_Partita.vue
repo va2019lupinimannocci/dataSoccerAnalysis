@@ -389,7 +389,7 @@ export default {
       xCoord: 70,
       yCoord: 20,
       // colore del campo da calcio
-      fillColor: '#33A616',
+      fillColor: '#f9fafa',
       // colore delle linee del campo da calcio
       lineColor: '#AEAEAE',
       // dimensioni campo da calcio
