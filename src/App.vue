@@ -98,7 +98,7 @@ import counter from './components/counter'
 import * as d3 from 'd3'
 import _ from 'lodash'
 
-window.d3 = d3
+// window.d3 = d3
 
 export default {
   name: 'App',
@@ -147,7 +147,7 @@ export default {
     }
   },
   mounted () {
-    window.scaler = this.testScale
+    // window.scaler = this.testScale
   },
   beforeCreate () {
     d3.csv(
@@ -222,7 +222,7 @@ export default {
     },
 
     tempNames () {
-      const v = _.sampleSize(this.filteredSample, 50)
+      const v = _.sampleSize(this.filteredSample, 100)
       v.sort((a, b) => {
         if (a.group < b.group) {
           return -1

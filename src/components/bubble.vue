@@ -92,6 +92,7 @@ export default {
       // Pack the circles inside the viewbox
       return pack()
         .size([1000, 1000])
+        .radius(d => d.value * 2)
         .padding(10)(rootHierarchy)
     }
   }
@@ -119,9 +120,13 @@ export default {
   }
 
   .player__label {
-    fill: black;
-    font-weight: bold;
+    fill: darkgray;
+
     font-size: 12px;
     text-shadow: 0 2px 9px rgba(0, 0, 0, 0.2);
+  }
+  g.flower:hover text{
+    fill: black;
+    font-weight: bold;
   }
 </style>
