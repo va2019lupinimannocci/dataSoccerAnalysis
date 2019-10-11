@@ -24,7 +24,7 @@
           @mouseleave="activeItem = null;"
           @click="pushCounterElement(item.id)"
         >
-          {{ item.name }}
+          {{ decodeUnicodeName(item.name) }}
         </li>
       </ul>
     </div>
@@ -48,7 +48,7 @@
     </b-row>
     <b-row>
       <b-col style="text-align: center;">
-        <h3>Data values of {{this.nameOfThePlayer}}</h3>
+        <h3>Data values of {{decodeUnicodeName(this.nameOfThePlayer)}}</h3>
       </b-col>
     </b-row>
     <b-row style="margin-left: 22%;">
@@ -71,7 +71,7 @@
       </b-col>
     </b-row>
     <b-row>
-      <b-col style="text-align: center;">
+      <b-col>
         <h3>Visualization Description</h3>
         <div class="description" style="font-size: 18px">
           <p>This visualization, based on measure selected, has the scope to help the D.S. manager to check what are the football player that have a certain skills.
@@ -253,24 +253,24 @@ export default {
         strokeWidth: sameGroup ? 5 : 2
       }
     },
+    decodeUnicodeName: (str) => str
+      .replace(/\\u(....)/g, (match, p1) => String.fromCharCode(parseInt(p1, 16)))
+      .replace(/\\(\d{3})/g, (match, p1) => String.fromCharCode(parseInt(p1, 8))),
     // bubble chart preparation
     prepareListBubbleChart (array) {
-      var selectElements = []
+      let selectElements = []
+      const colors = {
+        Goalkeeper: '#1E8361',
+        Defender: '#BF5F00',
+        Midfielder: '#736AB3',
+        Forward: '#D42884'
+      }
       array.forEach((element, index, array) => {
+        selectElements.push({
+          name: this.decodeUnicodeName(element.name),
+          amount: element.score,
+          color: colors[element.group]})
         // var score = 0
-        // score = element.pass + element.headpass + element.airduel + element.foul + element.dribbling + element.corner + element.cross + element.kick + element.defense + element.acceleration + element.goal
-        if (element.group === 'Goalkeeper') {
-          selectElements.push({name: element.name, amount: element.score, color: '#1E8361'})
-        }
-        if (element.group === 'Defender') {
-          selectElements.push({name: element.name, amount: element.score, color: '#BF5F00'})
-        }
-        if (element.group === 'Midfielder') {
-          selectElements.push({name: element.name, amount: element.score, color: '#736AB3'})
-        }
-        if (element.group === 'Forward') {
-          selectElements.push({name: element.name, amount: element.score, color: '#D42884'})
-        }
       })
       this.tempNames2 = selectElements
     },
@@ -402,7 +402,6 @@ export default {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-align: center;
     color: #2c3e50;
   }
 </style>

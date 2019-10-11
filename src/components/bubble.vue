@@ -10,7 +10,8 @@
         }"
       >
         <circle class="player__circle" :r="player.r" :fill="player.data.color"></circle>
-        <text class="player__label">{{ player.data.name }} {{player.data.amount}}</text>
+        <text class="player__label" dy="-6">{{player.data.name}}</text>
+        <text class="player__label" dy="6">{{player.data.amount}}</text>
       </g>
     </svg>
   </div>
@@ -120,6 +121,7 @@ export default {
   .player__label {
     fill: black;
     font-weight: bold;
+    font-size: 12px;
     text-shadow: 0 2px 9px rgba(0, 0, 0, 0.2);
   }
 </style>
