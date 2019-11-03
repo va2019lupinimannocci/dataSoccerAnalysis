@@ -9,6 +9,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import App from './App'
 import LandPage from './LandPage'
+import VisualizzazionePartita from './components/Visualizzazione_Partita'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
@@ -21,6 +22,10 @@ const routes = [
   {
     path: '/',
     component: LandPage
+  },
+  {
+    path: '/matches',
+    component: VisualizzazionePartita
   }
 ]
 

@@ -8,7 +8,7 @@
         <b-navbar-nav>
           <b-nav-item href="#">Visualizzazione squadre</b-nav-item>
           <b-nav-item href="#">Visualizzazione giocatori</b-nav-item>
-          <b-nav-item href="#">Visualizzazione partita</b-nav-item>
+          <b-nav-item to="/matches">Visualizzazione partita</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
@@ -17,8 +17,11 @@
 </template>
 
 <script>
+// eslint-disable-next-line camelcase
+import Visualizzazione_Partita from '@/components/Visualizzazione_Partita'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {Visualizzazione_Partita}
 }
 </script>
 
