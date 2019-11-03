@@ -10,6 +10,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App'
 import LandPage from './LandPage'
 import VisualizzazionePartita from './components/Visualizzazione_Partita'
+import VisualizzazioneSquadre from './components/squadVisualization'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
@@ -26,6 +27,10 @@ const routes = [
   {
     path: '/matches',
     component: VisualizzazionePartita
+  },
+  {
+    path: '/teams',
+    component: VisualizzazioneSquadre
   }
 ]
 
