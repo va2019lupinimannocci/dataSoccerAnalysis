@@ -11,6 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "apexcharts": "^3.8.4",
     "bootstrap-vue": "^2.0.0-rc.27",
     "crossfilter2": "^1.4.7",
     "d3": "^5.9.7",
