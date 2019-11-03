@@ -4,6 +4,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import BootstrapVue from 'bootstrap-vue'
 
+import 'normalize.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
@@ -38,7 +39,7 @@ const router = new VueRouter({
   routes
 })
 
-// eslint-disable-next-line no-new
+/* eslint-disable no-new */
 new Vue({
   el: '#app',
   components: { App },
