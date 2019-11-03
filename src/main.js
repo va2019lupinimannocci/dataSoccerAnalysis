@@ -37,7 +37,7 @@ const routes = [
   {
     path: '/players',
     component: VisualizzazioneGiocatori
-  },
+  }
 ]
 
 const router = new VueRouter({

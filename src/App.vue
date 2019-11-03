@@ -19,7 +19,7 @@
 <script>
 // eslint-disable-next-line camelcase
 export default {
-  name: 'App',
+  name: 'App'
 }
 </script>
 
