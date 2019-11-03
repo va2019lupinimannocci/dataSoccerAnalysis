@@ -7,7 +7,7 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item to="/teams">Visualizzazione squadre</b-nav-item>
-          <b-nav-item href="#">Visualizzazione giocatori</b-nav-item>
+          <b-nav-item to="/players">Visualizzazione giocatori</b-nav-item>
           <b-nav-item to="/matches">Visualizzazione partita</b-nav-item>
         </b-navbar-nav>
       </b-collapse>
@@ -20,9 +20,6 @@
 // eslint-disable-next-line camelcase
 export default {
   name: 'App',
-  components: {
-    VisualizzazioneGiocatori
-  }
 }
 </script>
 

@@ -100,11 +100,6 @@ export default {
 </script>
 
 <style>
-  body {
-    font: 9px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  }
-
   svg {
     display: block;
     margin: 0 auto;

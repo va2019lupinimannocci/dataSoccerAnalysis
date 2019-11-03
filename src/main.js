@@ -12,6 +12,7 @@ import App from './App'
 import LandPage from './LandPage'
 import VisualizzazionePartita from './components/Visualizzazione_Partita'
 import VisualizzazioneSquadre from './components/squadVisualization'
+import VisualizzazioneGiocatori from './VisualizzazioneGiocatori'
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
@@ -32,7 +33,11 @@ const routes = [
   {
     path: '/teams',
     component: VisualizzazioneSquadre
-  }
+  },
+  {
+    path: '/players',
+    component: VisualizzazioneGiocatori
+  },
 ]
 
 const router = new VueRouter({
